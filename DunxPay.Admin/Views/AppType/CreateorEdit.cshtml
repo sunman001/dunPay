@@ -1,0 +1,93 @@
+﻿
+@{
+    ViewBag.Title = "CREATE";
+    Layout = "~/Views/Shared/_layout_form.cshtml";
+}
+<form id="dx-form" class="dx-form" method="post">
+    <input type="hidden" id="id" name="id" value=""/>
+    <div class="form-group">
+        <label>
+            <span class="form-group-label">所属父级:</span>
+            <input id="parentId" value="" name="parentId"/>
+        </label>
+    </div>
+
+    <div class="form-group">
+        <label>
+            <span class="form-group-label">应用名称:</span>
+            <input id="name" class="easyui-textbox easyui-validatebox" name="name" type="text" data-options="required:true"/>
+        </label>
+    </div>
+    <div class="form-group">
+        <label>
+            <span class="form-group-label">排序:</span>
+            <input id="sort" class="easyui-textbox easyui-numberbox " name="sort" value="0" type="text" name="name" data-options="required:true"/>
+        </label>
+    </div>
+
+
+</form>
+@section scripts{
+    <script type="text/javascript">
+        $('#parentId').combobox({
+            url: G.http.buildPublicUrl("combobox/GetAppType"),
+            method: 'post',
+            valueField: 'id',
+            textField: 'text',
+            editable: false,
+            required: true
+        });
+        $(function() {
+            //加载父级应用类型
+            var id = parseInt('@Request.QueryString["id"]');
+            if (id>0 ) {
+                $("#id").val('@Request.QueryString["id"]');
+                $('#dx-form').form('load', G.http.buildUrl("AppType/Edit") + "/" + $("#id").val());
+            }
+            //保存
+            function save() {
+                var form = $("#dx-form");
+                if (!form.form("validate")) {
+                    $.messager.alert('警告', '必填项没有填写完整！');
+                    return false;
+                }
+                if (parentId==-1) {
+                    $.messager.alert('警告', '请选择所属父级！');
+                    return false;
+                }
+
+                form.ajaxSubmit({
+                    url: G.http.buildUrl("AppType/create"),
+                    type: 'post',
+                    success: function (data) {
+                        if (data.isSuccess) {
+                            dialog.closePopup("提示", data.message, "addAppType", "tableAppType");
+                        } else {
+                            $.messager.alert('提示', data.message);
+                        }
+                    }
+                });
+            }
+
+            //修改
+            function Edits() {
+                var form = $("#dx-form");
+                if (!form.form("validate")) {
+                    $.messager.alert('警告', '必填项没有填写完整！');
+                    return false;
+                }
+                form.ajaxSubmit({
+                    url: G.http.buildUrl("AppType/edit"),
+                    type: 'post',
+                    success: function (data) {
+                        if (data.isSuccess) {
+                            dialog.closePopup("提示", data.message, "addAppType", "tableAppType");
+                        } else {
+                            $.messager.alert('提示', data.message);
+                        }
+                    }
+                });
+            }
+        })
+    </script>
+}

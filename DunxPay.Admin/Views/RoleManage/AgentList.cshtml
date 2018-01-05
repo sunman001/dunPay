@@ -1,0 +1,120 @@
+﻿@{
+    ViewBag.Title = "商务角色管理";
+    Layout = "~/Views/Shared/_layout_list.cshtml";
+}
+
+@section toolbar_search
+{
+    <div id="win" class="easyui-window" title="Login" closed="true" style="width:300px;height:180px;">
+        <form style="padding:10px 20px 10px 40px;">
+            <p>Name: <input type="text"></p>
+            <p>Pass: <input type="password"></p>
+            <div style="padding:5px;text-align:center;">
+                <a href="#" class="easyui-linkbutton" icon="icon-ok">Ok</a>
+                <a href="#" class="easyui-linkbutton" icon="icon-cancel">Cancel</a>
+            </div>
+        </form>
+    </div>
+}
+<table id="RoleAgent" toolbar="#toolbar"></table>
+
+@section scripts{
+
+    <script type="text/javascript">
+
+        $(function () {
+
+            InitGrid();
+
+        })
+
+        //绑定数据
+        function InitGrid() {
+
+            $('#RoleAgent').datagrid({
+                url: G.http.buildUrl("RoleAgentManage/List"),
+                fitColumns: true,//自适应网格(如果是 false 则显示横向滚动条)
+                striped: true,//奇偶行不同背景
+                pagination: true,//True 就会在 datagrid 的底部显示分页栏
+                rownumbers: true,//显示行号
+                selectOnCheck: true,
+                idField: "id",//主键列
+                sortName: "id",//默认排序字段
+                sortOrder: "desc",//默认排序(asc/desc)
+                columns: [[
+                    { field: 'id', checkbox: true },
+                    { field: 'name', title: '角色名称', width: 100 },
+                    { field: 'createdBy', title: '创建者姓名', width: 100 },
+                    { field: 'createdOn', title: '创建时间', width: 100 },
+                    {
+                        field: 'isEnabled', title: '是否可用', width: 100, formatter: function (val) {
+                            if (val == true) {
+                                return '<span style="color:green">是</font>';
+                            }
+                            else {
+                                return '<span style="color:red">否</font>';
+                            }
+                        }
+                    },
+                    {
+                        field: 'isDeleted', title: '是否已被删除', width: 100, formatter: function (val) {
+                            if (val == true) {
+                                return '<span style="color:red">是</font>';
+                            }
+                            else {
+                                return '<span style="color:green">否</font>';
+                            }
+
+                        }
+                    },
+
+                ]],
+                pageNumber: 1,//初始化页码
+                remoteSort: true,//是否数据源排序
+                pageSize: 20,//初始化分页大小
+                pageList: config.grid.pageList,//初始化页面尺寸的选择列表
+                loadMsg: "正在查询数据...",//加载提示
+
+            });
+        }
+
+        //一键启用or禁用
+        function EnabledOrDisable(val) {
+
+            var id = $("input[name='id']:checked").map(function () {
+                return $(this).val();
+            }).get().join(',');
+
+            if (id == "") {
+                $.messager.alert('提示', '请选择要操作的数据!', "error");
+
+            } else {
+
+                $.ajax({
+                    url: G.http.buildUrl("RoleAgentManage/EnabledOrDisable"),
+                    type: "post",
+                    data: { IdList: id, SearchState: val },
+                    success: function (data) {
+                        if (data == 1) {
+                            $.messager.alert('提示', '操作成功!', "info", function () {
+                                window.location.reload();
+                            });
+                            return true;
+                        }
+                        else {
+                            $.messager.alert('提示', '操作失败!', "error");
+                            return false;
+                        }
+                    }
+                })
+            }
+        };
+
+
+        //新增
+        function create() {
+            $('#win').window('open');
+        }
+
+    </script>
+}

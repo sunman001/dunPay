@@ -1,0 +1,109 @@
+﻿
+@{
+    ViewBag.Title = "AppAuditing";
+    Layout = "~/Views/Shared/_layout_form.cshtml";
+}
+<input type="hidden" id="id" name="id" value="" />
+<table id="tableAppRate"></table>
+<div style="color:red;"> 备注（10%，请填写0.1 ，只能是1位整数或者保留四位小数）</div>
+@section scripts{
+    <script type="text/javascript">
+
+        $("#id").val('@Request.QueryString["id"]');
+        var gridAppRate = $('#tableAppRate');
+        gridAppRate.datagrid({
+            url: G.http.buildUrl("app/AppRate/" + $("#id").val()), //后台加载地址
+            method: "get", //请求类型(get/post)
+            border: true, //边框
+            autoRowHeight: false, //自动行高
+            fitColumns: true, //自适应网格(如果是 false 则显示横向滚动条)
+            striped: true, //奇偶行不同背景
+            nowrap: true,
+            singleSelect: true,
+            pagination: false, ////True 就会在 datagrid 的底部显示分页栏
+            rownumbers: true, //显示行号
+            idField: "r_id", //主键列
+            columns: [//列头
+                [
+                    { field: 'p_name', title: '支付类型', width: 200, align: 'center' },
+                    {
+                        field: 'r_proportion',
+                        title: '通道费率比例',
+                        width: 400,
+                        align: 'center',
+                        editor: { type: 'numberbox', options: { precision: 4 } }
+                    }
+                ]
+            ],
+            onClickRow: function(index, row) {
+                row.editing = false;
+                edit(index);
+            }
+
+        });
+        //当前编辑行索引
+        var editIndex = null;
+
+        //获取选中行索引
+        function getSelectRowIndex() {
+            var row = gridAppRate.datagrid("getSelected");
+            if (!row) return;
+            return gridAppRate.datagrid("getRowIndex", row);
+        };
+
+        //结束编辑
+        var endEditing = function() {
+            if (editIndex == null) return true;
+            if (gridAppRate.datagrid("validateRow", editIndex)) {
+                var ed = gridAppRate.datagrid("getEditor", { index: editIndex, field: "r_id" });
+                gridAppRate.datagrid("endEdit", editIndex);
+                editIndex = null;
+                return true;
+            }
+            return false;
+        };
+
+        //开始编辑获取焦点
+        function startEditFocus() {
+            if (editIndex != null) {
+                var edit = gridAppRate.datagrid("getEditor", { index: editIndex, field: "r_proportion" });
+                //console.info(edit);
+                $(edit.target).textbox("textbox").focus();
+            }
+        };
+
+        //编辑选中行
+        window.edit = function(index) {
+            var rowIndex = index == null ? getSelectRowIndex() : index;
+            if (rowIndex == null) return;
+            if (editIndex != rowIndex) {
+                if (endEditing()) {
+                    gridAppRate.datagrid("beginEdit", rowIndex);
+                    editIndex = rowIndex;
+                }
+            }
+            startEditFocus();
+        };
+
+        //设置通道费率
+        function AppRateSetup() {
+            var id = $("#id").val();
+            var appRateList = gridAppRate.datagrid("getData").rows;
+            $.ajax({
+                url: G.http.buildUrl("App/AppRateSetup"),
+                dataType: 'json',
+                type: 'post',
+                data: { id: id, appRateList: appRateList },
+                success: function(response) {
+                    if (response.isSuccess) {
+                        dialog.closePopup("提示", response.message, "addApp", "tableAPP");
+                    } else {
+                        $.messager.alert('提示', response.message);
+                    }
+                }
+            });
+
+        }
+
+    </script>
+}

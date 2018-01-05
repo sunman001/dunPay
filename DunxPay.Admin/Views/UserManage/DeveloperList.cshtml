@@ -1,0 +1,236 @@
+﻿
+@{
+    ViewBag.Title = "开发者管理";
+    Layout = "~/Views/Shared/_layout_list.cshtml";
+}
+@section toolbar_search
+{
+    <div id="select-txt">
+        <ul class="frm-ul clearfix">
+            <li>
+                <select id="searchType" class="easyui-combobox" editable="false" style="width: 100px; height: 30px;">
+                    <option value="1">邮箱</option>
+                    <option value="2">登录名称</option>
+                    <option value="3">开户名称</option>
+                    <option value="4">上级名称</option>
+                    <option value="5">编号</option>
+                </select>
+            </li>
+            <li>
+                <input id="searchKey" class="easyui-textbox" style="width: 150px; height: 30px;" data-options="prompt:'请输入关键字...'," />
+            </li>
+            <li>
+                <select id="searchState" class="easyui-combobox" editable="false" style="width: 100px; height: 30px;">
+                    <option value="-1">状态</option>
+                    <option value="1">正常</option>
+                    <option value="0">锁定</option>
+                </select>
+            </li>
+            <li>
+                <select id="category" class="easyui-combobox" editable="false" style="width: 100px; height: 30px;">
+                    <option value="">认证类型</option>
+                    <option value="0">个人</option>
+                    <option value="1">企业</option>
+                </select>
+            </li>
+            <li>
+                <select id="relation_type" class="easyui-combobox" editable="false" style="width: 100px; height: 30px;">
+                    <option value="">上级类型</option>
+                    <option value="1">商务</option>
+                    <option value="2">代理商</option>
+                </select>
+            </li>
+            <li>
+                <select id="auditstate" class="easyui-combobox" editable="false" style="width: 100px; height: 30px;">
+                    <option value="">审核状态</option>
+                    <option value="-1">未通过</option>
+                    <option value="1">通过审核</option>
+                    <option value="0">等待审核</option>
+                </select>
+            </li>
+            <li>
+                <select id="riskM" class="easyui-combobox" editable="false" style="width: 100px; height: 30px;">
+                    <option value="">风控资料</option>
+                    <option value="1">已完善</option>
+                    <option value="2">未完善</option>
+                </select>
+            </li>
+            <li>
+                <a href="javascript:search();" id="btnSearch" class="btn btn-primary">查询</a>
+            </li>
+        </ul>
+    </div>
+}
+<table id="Developer" toolbar="#toolbar"></table>
+<div id="DeveloperTable"> </div>
+@section scripts{
+    <script src="~/assets/easyui/datagrid-detailview.js"></script>
+    <script type="text/javascript">
+
+        var grid = $("#Developer");
+
+        //绑定数据
+        var _options = {
+            url: "UserDeveloperManage/List",
+            idField: "u_id",//主键列
+            sortName: "u_id",//默认排序字段
+            columns: [[
+                { field: '', checkbox: true },
+                { field: 'u_id', title: '编号', width: 30, sortable: true },
+                { field: 'u_email', title: '登录邮箱地址', width: 100 },
+                { field: 'u_realname', title: '真实姓名', width: 150 },
+                {
+                    field: 'relation_type', title: '所属类型', width: 30, sortable: true, formatter: function (val, row) {
+                        if (val == 1) {
+                            row.relation_type2 = val;
+                            return "商务";
+                        }
+                        else {
+                            row.relation_type2 = val;
+                            return "代理商";
+                        }
+                    }
+                },
+                {
+                    field: 'relation_type2', title: '所属上级', width: 30, formatter: function (val, rowData) {
+                        if (val == 1) {
+                            return rowData.businessName;
+                        }
+                        else {
+                            return rowData.agentName;
+                        }
+                    }
+                },
+                {
+                    field: 'u_state', title: '账户状态', width: 40, formatter: function (val) {
+                        if (val == 0) {
+                            return '<span style="color:red">锁定</span>';
+                        }
+                        else {
+                            return '<span style="color:green">正常</span>';
+                        }
+                    }
+                },
+                {
+                    field: 'u_auditstate', title: '审核状态', width: 40, formatter: function (val) {
+                        if (val == 0) {
+                            return '<span style="color:orange">等待审核</span>';
+                        }
+                        else if (val == 1) {
+                            return '<span style="color:green">通过</span>';
+                        }
+                        else {
+                            return '<span style="color:red">未通过</span>';
+                        }
+                    }
+                },
+                {
+                    field: "_operate",
+                    title: "操作",
+                    width: 200,
+                    align: "center",
+                    sortable: false,
+                    formatter: function (value, row, index) {
+                        return buildAction(row, index);
+                    }
+                }
+            ]],
+            view: detailview,
+            detailFormatter: function (rowIndex, rowData) {
+                return '<div class="dcnt-tab"><table class="table-lst"><tr><td>QQ号码: ' + rowData.u_qq +
+                    '</td><td>开户银行: ' + rowData.u_bankname +
+                    '</td><td>开户名称:' + rowData.u_name + '</td><td>注册时间:' + rowData.u_time + '</td></tr><tr><td>开户账户: ' + rowData.u_account +
+                '</td><td>认证类型: ' + (rowData.u_category == 0 ? "个人" : "企业") +
+                '</td><td>证件号码:' + (rowData.u_category == 0 ? rowData.u_idnumber : rowData.u_blicensenumber) + '</td><td>审核人:' + rowData.u_auditor + '</td></tr><tr><td>联系电话: ' + rowData.u_phone +
+                '</td><td>是否产品备案: ' + (rowData.isRecord == true ? "是" : "否") +
+                '</td><td colspan="2">是否签订合同:' + (rowData.isSignContract == true ? "是" : "否") + '</td></tr></table></div>';
+            },
+            onLoadSuccess() {
+                $('.button-action').linkbutton({ plain: 'true' });
+            }
+        };
+
+        dxgrid.datagrid(grid, _options);
+
+        //一键启用or禁用
+        function EnabledOrDisable(val) {
+
+            var checkRows = $('#Developer').datagrid('getChecked');
+            var id = [];
+            $.each(checkRows,
+                function (i, checkRow) {
+                    id[i] = checkRow.u_id;
+                });
+            var ids = id.join(',');
+            if (ids == "") {
+                $.messager.alert('提示', '请选择要操作的数据!', "error");
+
+            } else {
+
+                $.ajax({
+                    url: G.http.buildUrl("UserDeveloperManage/EnabledOrDisable"),
+                    type: "post",
+                    data: { IdList: ids, SearchState: val },
+                    success: function (data) {
+                        if (data == 1) {
+                            dialog.closeMessager('提示', '操作成功!', "Developer");
+                            return true;
+                        }
+                        else {
+                            $.messager.alert('提示', '操作失败!', "error");
+                            return false;
+                        }
+                    }
+                })
+            }
+        };
+
+        //查询
+        window.search = function () {
+            $('#Developer').datagrid("load",
+                {
+                    SearchType: $.trim($("#searchType").combobox("getValue")),
+                    SearchKey: $.trim($("#searchKey").textbox("getValue")),
+                    SearchState: $.trim($("#searchState").combobox("getValue")),
+                    Category: $.trim($("#category").combobox("getValue")),
+                    Relation_type: $.trim($("#relation_type").combobox("getValue")),
+                    Auditstate: $.trim($("#auditstate").combobox("getValue")),
+                    RiskM: $.trim($("#riskM").combobox("getValue"))
+                });
+        };
+
+        //添加
+        function create() {
+
+            var buttons = [
+                {
+                    text: '保存',
+                    iconCls: 'icon-save',
+                    handler: function () {
+                        save();
+                    }
+                }
+            ];
+            dialog.openPopup('#DeveloperTable', '录入开发者信息', '/UserManage/DCreateorEdit', buttons);
+        }
+
+        //修改
+        function Edit(index) {
+            var row = _grid.getRowByIndex(grid, index);
+
+            var id = row.id;
+            var buttons = [
+                {
+                    text: '修改',
+                    iconCls: 'icon-save',
+                    handler: function () {
+                        Edits();
+                    }
+                }
+            ];
+            dialog.openPopup('#OperateTable', '修改开发者信息', '/UserManage/DCreateorEdit?id=' + id + '', buttons);
+        }
+
+    </script>
+}
+

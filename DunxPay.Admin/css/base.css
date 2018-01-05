@@ -1,0 +1,55 @@
+﻿body {  }
+
+li { list-style: none; }
+a { text-decoration: none; }
+a:active, a:hover { outline: 0; text-decoration: none; }
+/*标题*/
+.frm-title{  margin-left: -1px; overflow: hidden}
+.toolbar{ margin-top: 10px;}
+.toolbar_buttons{ margin-left: 15px; margin-bottom: 15px;}
+/*查询*/
+.frm-ul { background: #fff; margin-left: -1px;height: 40px;}
+.frm-ul > li { float: left; position: relative; margin-left: 15px; padding-bottom: 0px; }
+.frm-ul .txtipt { width: 90px; padding: 9px 10px; height: 14px; background: none; border: none; _border: 0px; -webkit-border-radius: 3px; -moz-border-radius: 3px; border-radius: 3px; color: #333;  }
+.frm-ul .dataipt { width: 80px; }
+.frm-ul .fg { margin: 0px 2px; }
+/*按钮*/
+.btn { padding: 5px 12px 5px 12px; display: inline-block; margin-bottom: 0; font-weight: normal; text-align: center; vertical-align: middle; cursor: pointer; border: 1px solid #ddd; white-space: nowrap; border-radius: 4px; line-height: 1.5; letter-spacing: 2px; color: #666; }
+.btn-primary { color: #fff; background: #3498db; border-color: #3498db; }
+/* 重写easyui表格*/
+.datagrid-header { overflow: hidden;cursor: default; border-width: 0 0 1px 0;border-style: solid;}
+.datagrid-header-inner {float: left;width: 10000px;}
+.datagrid-row td{  min-height: 38px; padding-top: 10px !important; padding-bottom: 10px !important;}
+.datagrid-header td,.datagrid-body td,.datagrid-footer td { border-width: 0 0px 1px 0px;border-style: solid;margin: 0;padding: 0; border-color: #ddd}
+
+.frm-datagrid{margin-left: 15px;  }
+.datagrid-header-row{ height: 38px;}
+/*.datagrid-row{ height: 38px;}*/
+.pagination-info{ margin-right: 30px;}
+.datagrid-toolbar{background: #ffffff}
+.datagrid .datagrid-pager {display: block;margin: 0;border-width: 0px 0 0 0;border-style: solid;
+}
+/*表格详情*/
+.dcnt-tab { margin-left: -6px; padding: 6px; background: #edf7fe; }
+.table-lst { width: 100%; border-left: 1px solid #ddd; border-top: 1px solid #dfe6ec; }
+.table-lst tbody td { height: 25px; padding: 0px 6px; text-align: left; border-right: 1px solid #dfe6ec; border-bottom: 1px solid #dfe6ec; }
+.table-lst tbody td:first-child { border-left: none; padding: 0px; }
+.table-lst tbody:first-child td { padding: 0px 6px; text-align: left; }
+
+.dx-form{}
+.dx-form .form-group { line-height: 30px; margin-top: 5px; margin-bottom: 10px; }
+.dx-form .form-group .form-group-label{ display: inline-block; min-width: 150px; text-align: right;}
+.dx-form .form-group input{ line-height: 20px; min-width: 60%; }
+.dx-form .form-inline input{ width: auto !important;}
+
+.dx-form{}
+.dx-form .form-groups { line-height: 30px; margin-top: 5px; margin-bottom: 10px; margin-left: 20px; }
+.dx-form .form-groups .form-group-labels{ display: inline-block; min-width: 150px; text-align: right;}
+.dx-form .form-groups input{ line-height: 20px; }
+.dx-form .form-inline input{ width: auto !important;}
+
+.datagrid-btable .l-btn-plain{ padding: 0;}
+.datagrid-btable .l-btn-plain:hover,.datagrid-btable .l-btn-plain:active{ border: 0;background: transparent;}
+.datagrid-cell-c1-_operate{ /*height: auto;*/}
+.button-action{height: auto!important;}
+.datagrid-cell-c1-_operate .l-btn-icon-left .l-btn-text{ margin-left: 22px;}

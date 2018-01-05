@@ -1,0 +1,95 @@
+﻿@using System.Web.Optimization
+@using DunxPay.Admin.Extensions.Html
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="width=device-width"/>
+    <title>@ViewBag.Title</title>
+    <link href="~/assets/easyui/themes/gray/easyui.css" rel="stylesheet"/>
+    <link href="~/assets/easyui/themes/icon.css" rel="stylesheet"/>
+    @Styles.Render("~/css/mains")
+    @RenderSection("styles", false)
+    
+</head>
+<body>
+    <div id="toolbar" class="toolbar">
+        <div id="toolbar_buttons" class="toolbar_buttons">
+
+        </div>
+
+        <div id="toolbar_search">
+            @RenderSection("toolbar_search", false)
+        </div>
+    </div>
+    @RenderBody()
+    @Scripts.Render("~/js/main")
+<script type="text/javascript">
+    var requestUrl = "@Html.CurrentRoutePath()";
+    var toolbaButtonpPermissions = [];
+    var gridButtonpPermissions = [];
+    //验证按钮权限
+    function checkPermission() {
+        $.ajax({
+            url: G.consts.apiPublicUrl + "account/permissions?req=" + requestUrl,
+            type: "GET",
+            dataType: "JSON",
+            success: function(response) {
+                if (!response.isAuthenticated) {
+                    if (window.top !== window.self) {
+                        window.top.G.message.alert(response.message);
+                    } else {
+                        G.message.alert(response.message);
+                    }
+                    return null;
+                }
+                toolbaButtonpPermissions = response.toolbaButtonpPermissions || [];
+                gridButtonpPermissions = response.gridButtonpPermissions || [];
+                var toolbarbuttons = $("#toolbar_buttons");
+                //渲染有权限的工具栏按钮
+                if (toolbaButtonpPermissions.length > 0) {
+                    var html = "";
+                    $.each(toolbaButtonpPermissions,
+                        function (i, perm) {
+                            html += '<span> <a class="easyui-linkbutton"  data-options="iconCls:\'' + perm.buttonIcon + '\'" onclick="' + perm.jsOperatingFunction + '" href="javascript:void(0)" >' + perm.actionName+ '</a>  </span>';
+                        });
+                    toolbarbuttons.html(html);
+                }
+                $.parser.parse($("#toolbar_buttons"));
+            }
+        });
+    }
+    checkPermission();
+    //渲染有选取的表格按钮
+    function buildAction(row,index) {
+        //console.info("row:", row);
+        var tools = [];
+        if (gridButtonpPermissions.length > 0) {
+            $.each(gridButtonpPermissions,
+                function (i, perm) {
+                    tools.push(' <a class="operate icon-information_frame button-action"  data-options="iconCls:\'' + perm.buttonIcon + '\'" onclick="' + perm.jsOperatingFunction + "("+index+ ")" + '" href="javascript:void(0)" style="width:80px,height:25px;">' + perm.actionName + '</a> ');
+                });
+        }
+        return tools.join("&nbsp;");
+    }
+
+    //
+    var _grid = {
+        getRowByIndex:function (grid,index) {
+            var rows = grid.datagrid('getRows');
+            var row = rows[index];
+            return row;
+        }
+    }
+
+
+</script>
+   
+    @Scripts.Render("~/js/easyui")
+ 
+    @RenderSection("scripts", false)
+</body>
+</html>

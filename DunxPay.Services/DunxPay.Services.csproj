@@ -1,0 +1,106 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{7BA56FF8-36B6-4238-B2CF-B62AA1A10186}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>DunxPay.Services</RootNamespace>
+    <AssemblyName>DunxPay.Services</AssemblyName>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="GenericService.cs" />
+    <Compile Include="Impl\DunBase\AppService.cs" />
+    <Compile Include="Impl\DunBase\AppTypeService.cs" />
+    <Compile Include="Impl\DunBase\DxLoggerService.cs" />
+    <Compile Include="Impl\DunBase\DxBasicModuleActionService.cs" />
+    <Compile Include="Impl\DunBase\DxModuleActionService.cs" />
+    <Compile Include="Impl\DunBase\DxModuleService.cs" />
+    <Compile Include="Impl\DunBase\DxPermissionActionService.cs" />
+    <Compile Include="Impl\DunBase\DxPermissionService.cs" />
+    <Compile Include="Impl\DunBase\DxRoleService.cs" />
+    <Compile Include="Impl\DunBase\DxUserRoleMappingService.cs" />
+    <Compile Include="Impl\DunBase\JmpLocuserService.cs" />
+    <Compile Include="Impl\DunBase\JmpRisklevelallocationService.cs" />
+    <Compile Include="Impl\DunBase\JmpRisklevelService.cs" />
+    <Compile Include="Impl\DunBase\JmpUserService.cs" />
+    <Compile Include="Impl\DunBase\PaymodeService.cs" />
+    <Compile Include="Impl\DunBase\RbacService.cs" />
+    <Compile Include="Impl\Rbac\DeveloperUserProviderService.cs" />
+    <Compile Include="Impl\Rbac\AdminUserProviderService.cs" />
+    <Compile Include="Inter\DunBase\IAppService.cs" />
+    <Compile Include="Inter\DunBase\IAppTypeService.cs" />
+    <Compile Include="Inter\DunBase\IDxLoggerService.cs" />
+    <Compile Include="Inter\DunBase\IDxModuleActionService.cs" />
+    <Compile Include="Inter\DunBase\IDxModuleService.cs" />
+    <Compile Include="Inter\DunBase\IDxPermissionActionService.cs" />
+    <Compile Include="Inter\DunBase\IDxBasicsModuleActionService.cs" />
+    <Compile Include="Inter\DunBase\IDxPermissionService.cs" />
+    <Compile Include="Inter\DunBase\IDxRoleService.cs" />
+    <Compile Include="Inter\DunBase\IDxUserRoleMappingService.cs" />
+    <Compile Include="Inter\DunBase\IJmpLocuserService.cs" />
+    <Compile Include="Inter\DunBase\IJmpRisklevelallocationService.cs" />
+    <Compile Include="Inter\DunBase\IJmpRisklevelService.cs" />
+    <Compile Include="Inter\DunBase\IPaymodeService.cs" />
+    <Compile Include="Inter\DunBase\IRbacService.cs" />
+    <Compile Include="Inter\DunBase\IJmpUserService.cs" />
+    <Compile Include="Rbac\IUserProviderService.cs" />
+    <Compile Include="IService.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="..\DunxPay.Core\DunxPay.Core.csproj">
+      <Project>{23326DC7-61EE-4D5E-919C-F821B21398A5}</Project>
+      <Name>DunxPay.Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\DunxPay.Domain\DunxPay.Domain.csproj">
+      <Project>{C19B3A4B-2A7B-40D6-9584-909B512B2F37}</Project>
+      <Name>DunxPay.Domain</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\DunxPay.Global\DunxPay.Global.csproj">
+      <Project>{E744EE50-E728-4FC6-B9D4-5A763D96BC89}</Project>
+      <Name>DunxPay.Global</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\DunxPay.Repositories\DunxPay.Repositories.csproj">
+      <Project>{33293014-5F97-45F7-A0D2-AA4A388045E3}</Project>
+      <Name>DunxPay.Repositories</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\DunxPay.ViewModel\DunxPay.ViewModel.csproj">
+      <Project>{F3FC8BA3-05E9-4AEA-A306-9862B3BF6559}</Project>
+      <Name>DunxPay.ViewModel</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>

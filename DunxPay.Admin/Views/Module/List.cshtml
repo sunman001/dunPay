@@ -1,0 +1,154 @@
+﻿
+@{
+    ViewBag.Title = "List";
+    Layout = "~/Views/Shared/_layout_list.cshtml";
+}
+
+@section toolbar_search
+{
+    <div id="select-txt">
+        <ul class="frm-ul clearfix">
+            <li>
+                <select id="type" class="easyui-combobox" editable="false" style="width: 100px; height: 30px;">
+                    <option value="1">平台名称</option>
+                    <option value="2">模块名称</option>
+                    <option value="3">模块编号</option>
+                    <option value="4">创建者</option>
+                </select>
+            </li>
+            <li>
+                <input id="txtseach" class="easyui-textbox" style="width: 150px; height: 30px;" data-options="prompt:'请输入关键字...'," />
+            </li>
+            <li>
+                <select id="state" class="easyui-combobox" editable="false" style="width: 100px; height: 30px;">
+                    <option value="0">状态</option>
+                    <option value="2">锁定</option>
+                    <option value="1">正常</option>
+                </select>
+            </li>
+            <li>
+                <a href="javascript:search();" id="btnSearch" class="btn btn-primary">查询</a>
+                <a class="easyui-linkbutton" onclick="getSelectedRows()">获取选中</a>
+            </li>
+        </ul>
+    </div>
+
+}
+<table id="tableModule" toolbar="#toolbar"></table>
+<div id="addModule"> </div>
+@section scripts{
+    <script src="~/assets/easyui/datagrid-detailview.js"></script>
+    <script type="text/javascript">
+        var grid = $("#tableModule");
+        //grid.datagrid(options);
+        var _options = {
+            url:"module/list", //后台加载地址
+            columns: [//列头
+                [
+                    { field: '', checkbox: true },
+                    { field: 'id', title: '#', width: 50, align: 'left', sortable: true },
+                    { field: 'clientName', title: '平台名称', width: 100, align: 'left' },
+                    {
+                        field: 'name',
+                        title: '模块名称',
+                        width: 200,
+                        sortable: true,
+                        align: 'left',
+                        resizable: true,
+                        fixed: true
+                    },
+                    {
+                        field: 'code',
+                        title: '模块编码',
+                        width: 150,
+                        resizable: true,
+                        fixed: true,
+                        sortable: true,
+                        align: 'left'
+                    },
+                    { field: 'requestUrl', title: '请求路径', width: 200, align: 'left' },
+                    { field: 'icon', title: '图标', width: 80, align: 'center', sortable: true },
+                    { field: 'sort', title: '排序', width: 80, align: 'center', sortable: true },
+                    {
+                        field: 'isEnabled',
+                        title: '是否可用',
+                        width: 80,
+                        align: 'center',
+                        sortable: true,
+                        formatter: function(value) {
+                            if (value) {
+                                return "<font style='color:green' >正常 </font>";
+                            } else {
+                                return "<font style='color:red' >锁定 </font>";
+                            }
+                        }
+
+                    },
+                    {
+                        field: "_operate",
+                        title: "操作",
+                        width: 200,
+                        align: "center",
+                        sortable: false,
+                        formatter: function(value, row, index) {
+                            return buildAction(row, index);
+                        }
+                    }
+                ]
+            ],
+            onLoadSuccess() {
+                $('.button-action').linkbutton({ plain: 'true' });
+            }
+
+        };
+        dxgrid.datagrid(grid, _options);
+        //查询
+        window.search = function () {
+            grid.datagrid("load",
+                {
+                    field: $.trim($("#type").combobox("getValue")),
+                    txtseach: $.trim($("#txtseach").textbox("getValue")),
+                    state: $.trim($("#state").combobox("getValue"))
+                });
+        };
+        //添加
+        function create() {
+            var buttons = [
+                {
+                    text: '保存',
+                    iconCls: 'icon-save',
+                    handler: function () {
+                        save();
+                    }
+                }
+
+            ];
+            dialog.openPopup('#addModule', '新增模块', '/Module/Create', buttons);
+        }
+        //修改
+        function Edit(index) {
+           // console.info("index:", index);
+            var row = _grid.getRowByIndex(grid, index);
+            var id = row.id;
+            console.info(row.id);
+            var buttons = [
+                {
+                    text: '修改',
+                    iconCls: 'icon-save',
+                    handler: function () {
+                        Save();
+                    }
+                }
+            ];
+            dialog.openPopup('#addModule', '修改模块', '/Module/Edit?id='+id+'', buttons);
+        }
+
+        function getSelectedRows() {
+            var rows = dxgrid.getSelectedRows(grid, "id");
+            //console.info("selected rows:",rows);
+        }
+    </script>
+}
+
+
+

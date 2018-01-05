@@ -1,0 +1,151 @@
+﻿@using DunxPay.Admin.Extensions.Html
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <link href="~/assets/easyui/themes/default/easyui.css" rel="stylesheet" />
+    @Html.InlineStyles("/app/css/easyui-override.css")
+    <title>运营管理</title>
+</head>
+<body>
+    <input id="del_id" type="hidden" name="del_id" value="" />
+    <div id="tb" style="padding:3px">
+        <a id="Enable" onclick="OperatingState(1)" href="#" class="easyui-linkbutton" data-options="plain:true,iconCls:'icon-add'">一键启用</a>
+        <a id="Disable" onclick="OperatingState(0)" href="#" class="easyui-linkbutton" data-options="plain:true,iconCls:'icon-remove'">一键禁用</a>
+        <a id="Add" href="#" class="easyui-linkbutton" data-options="plain:true,iconCls:'icon-remove'">添加用户</a>
+    </div>
+    <div>
+        <table id="Operate"></table>
+    </div>
+    <div id="dd" class="easyui-dialog">
+        <form id="form" name="form" method="post">
+            <table style="margin:8px">
+                <tr>
+                    <td>编号:</td>
+                    <td><input type="text" id="uId" name="uId" value="" disabled="disabled" /></td>
+                </tr>
+                <tr>
+                    <td>登录名称:</td>
+                    <td><input type="text" id="uLoginname" name="uLoginname" value="" class="required" /></td>
+                </tr>
+                <tr>
+                    <td>真实姓名:</td>
+                    <td><input type="text" id="uRealname" name="uLoginname" value="" class="required" /></td>
+                </tr>
+            </table>
+            <div id="dlg-buttons">
+                <a id="ok" href="#" class="easyui-linkbutton" iconcls="icon-ok">确定</a>
+                <a id="cancel" href="#" class="easyui-linkbutton" iconcls="icon-cancel">取消</a>
+            </div>
+        </form>
+    </div>
+    <script src="~/Scripts/jquery-3.2.1.min.js"></script>
+    <script src="~/assets/easyui/jquery.easyui.min.js"></script>
+    <script src="~/assets/easyui/locale/easyui-lang-zh_CN.js"></script>
+    <script src="~/app/global.js"></script>
+    <script type="text/javascript">
+
+        $(function () {
+
+            InitGrid();
+            InitDialog();
+
+            $('#cancel').click(function () {
+                $('#dd').dialog('close');
+            });
+
+
+        })
+
+        //绑定数据
+        function InitGrid() {
+
+            $('#Operate').datagrid({
+                url: G.http.buildUrl("UserMg/OperateList"),
+                fitColumns: true,//自适应网格(如果是 false 则显示横向滚动条)
+                striped: true,//奇偶行不同背景
+                pagination: true,//True 就会在 datagrid 的底部显示分页栏
+                rownumbers: true,//显示行号
+                selectOnCheck: true,
+                idField: "id",//主键列
+                sortName: "createdOn",//默认排序字段
+                sortOrder: "desc",//默认排序(asc/desc)
+                columns: [
+                    { field: 'uId', checkbox: true },
+                    { field: 'uLoginname', title: '登录名称', width: 100 },
+                    { field: 'uRealname', title: '真实姓名', width: 100 },
+                    { field: 'uDepartment', title: '部门', width: 100 },
+                    { field: 'uPosition', title: '职位', width: 100 },
+                    { field: 'uMobilenumber', title: '手机号码', width: 100 },
+                    { field: 'uEmailaddress', title: '电子邮箱', width: 100 },
+                    { field: 'uQq', title: 'QQ', width: 100 },
+                    {
+                        field: 'uState', title: '状态', width: 50, formatter: function (val) {
+                            if (val == 1) {
+                                return '<span style="color:green">正常</font>';
+                            } else {
+                                return '<span style="color:red">锁定</font>';
+                            }
+                        }
+                    },
+                    { field: 'uCount', title: '登录次数', width: 50 }
+                ],
+                toolbar: '#tb',
+                onDblClickRow: function (rowIndex, rowData) {
+                    $.ajax({
+                        url: G.http.buildUrl("UserMg/OperateModelId"),
+                        type: "post",
+                        data: { id: rowData['uId'] },
+                        success: function (data) {
+                            var data = eval("(" + data + ")");
+                            SetWebControls(data);
+                        }
+                    });
+                    $('#dd').dialog('open');
+                }
+
+            });
+        }
+
+        //编辑
+        function InitDialog() {
+            $('#dd').dialog({
+                title: '修改信息',
+                width: 400,
+                height: 400,
+                top: ($(window).height() - 400) * 0.5,      //居中
+                left: ($(window).width() - 400) * 0.5,
+                closed: true,
+                cache: false,
+                modal: true,
+                buttons: '#dlg-buttons'
+            });
+        }
+
+        //一键启用禁用
+        function OperatingState(val) {
+
+            var id = $("input[name='uId']:checked").map(function () {
+                return $(this).val();
+            }).get().join(',');
+
+            $.ajax({
+                url: G.http.buildUrl("UserMg/OperateModelIdState"),
+                type: "post",
+                data: { uId: id, start: val },
+                success: function (data) {
+                    if (data == 1) {
+                        $.messager.alert('提示', '操作成功!');
+                        return true;
+                    }
+                    else {
+                        $.messager.alert('提示', '操作失败!');
+                        return false;
+                    }
+                }
+            })
+        };
+
+    </script>
+</body>
+</html>

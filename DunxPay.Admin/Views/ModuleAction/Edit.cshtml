@@ -1,0 +1,123 @@
+﻿
+@{
+    ViewBag.Title = "CREATE";
+    Layout = "~/Views/Shared/_layout_form.cshtml";
+}
+<form id="dx-ModuleAction" class="dx-form" method="get">
+    <input type="hidden" id="id" name="id" value=""/>
+    <div class="form-group">
+        <label>
+            <span class="form-group-label">操作名称:</span>
+            <input id="name" name="name" class="easyui-textbox easyui-validatebox" type="text" data-options="required:true"/>
+        </label>
+    </div>
+    <div class="form-group">
+        <label>
+            <span class="form-group-label">操作码:</span>
+            <input id="code" name="code" class="easyui-textbox" type="text" data-options="required:true"/>
+        </label>
+    </div>
+    <div class="form-group">
+        <label>
+            <span class="form-group-label">是否是按钮:</span>
+            <input id="isButton" name="isButton" class="easyui-switchbutton" data-options="onText:'是',offText:'否',checked:true" onclick="getvalue()">
+        </label>
+    </div>
+    <div class="form-group" id="buttonTypeDiv">
+        <label>
+            <span class="form-group-label">按钮类型:</span>
+            <select id="buttonType" name="buttonType" class="easyui-combobox">
+                <option value="0">请选择按钮类型</option>
+                <option value="1">工具栏</option>
+                <option value="2">表格</option>
+            </select>
+        </label>
+    </div>
+    <div class="form-group" id="jsOperatingFunctionDiv" >
+        <label>
+            <span class="form-group-label">js操作函数:</span>
+            <input id="jsOperatingFunction" class="easyui-textbox" type="text" name="jsOperatingFunction"/>
+        </label>
+    </div>
+    <div class="form-group" id="buttonIconDiv">
+        <label>
+            <span class="form-group-label">按钮图标:</span>
+            <input id="buttonIcon"  class="easyui-textbox" type="text" name="buttonIcon"/>
+        </label>
+    </div>
+    <div class="form-group">
+        <label>
+            <span class="form-group-label">排序:</span>
+            <input id="sort" name="sort" class="easyui-textbox easyui-numberbox " value="0" type="text" name="name" data-options="required:true"/>
+        </label>
+    </div>
+
+</form>
+@section scripts{
+    <script type="text/javascript">
+        $("#id").val('@Request.QueryString["id"]');
+        $('#dx-ModuleAction').form('load', G.http.buildUrl("ModuleAction/Edit") + "/" + $("#id").val());
+        $(function() {
+            $("#dx-ModuleAction").form({
+                //显示隐藏
+                onLoadSuccess: function() {
+                    getvalue();
+                }
+            });
+        });
+
+        //点击隐藏显示
+        function getvalue() {
+            var isButton = $("#isButton").switchbutton("options").checked;
+            if (!isButton) {
+                $("#buttonTypeDiv").hide();
+                $("#jsOperatingFunctionDiv").hide();
+                $("#buttonIconDiv").hide();
+            } else {
+                $("#buttonTypeDiv").show();
+                $("#jsOperatingFunctionDiv").show();
+                $("#buttonIconDiv").show();
+            }
+        }
+
+        //修改模块操作码
+        function EditMdouleAction() {
+            var form = $("#dx-ModuleAction");
+            if (!form.form("validate")) {
+                $.messager.alert('警告', '必填项没有填写完整！');
+                return false;
+            }
+            var isButton = $("#isButton").switchbutton("options").checked;
+            var buttonType = $.trim($("#buttonType").combobox("getValue"));
+            var jsOperatingFunction = $.trim($("#jsOperatingFunction").textbox("getValue"));
+            var buttonIcon = $.trim($("#buttonIcon").textbox("getValue"));
+            if (isButton) {
+                if (buttonType <= 0) {
+                    $.messager.alert('警告', '按钮类型必须选择！');
+                    return false;
+                }
+                if (jsOperatingFunction == "") {
+                    $.messager.alert('警告', 'js函数不能为空！');
+                    return false;
+                }
+                if (buttonIcon == "") {
+                    $.messager.alert('警告', '按钮图标不能为空！');
+                    return false;
+                }
+            }
+       $("#dx-ModuleAction").ajaxSubmit({
+                    url: G.http.buildUrl("ModuleAction/edit"),
+                    type: 'post',
+                    success: function(data) {
+                        if (data.isSuccess) {
+                            dialog.closePopup("提示", data.message, "addModuleAction", "tableDxModuleAction");
+                        } else {
+                            $.messager.alert('提示', data.message);
+                        }
+                    }
+                });
+            
+        }
+
+    </script>
+}

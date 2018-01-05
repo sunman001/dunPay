@@ -1,0 +1,161 @@
+﻿@{
+    Layout = "~/views/shared/_layout_list.cshtml";
+    ViewBag.Title = "运营管理";
+}
+@section toolbar_search
+{
+    <div id="select-txt">
+        <ul class="frm-ul clearfix">
+            <li>
+                <select id="searchType" class="easyui-combobox" editable="false" style="width: 100px; height: 30px;">
+                    <option value="1">登录名称</option>
+                    <option value="2">真实姓名</option>
+                </select>
+            </li>
+            <li>
+                <input id="searchKey" class="easyui-textbox" style="width: 150px; height: 30px;" data-options="prompt:'请输入关键字...'," />
+            </li>
+            <li>
+                <select id="searchState" class="easyui-combobox" editable="false" style="width: 100px; height: 30px;">
+                    <option value="0">状态</option>
+                    <option value="1">正常</option>
+                    <option value="2">锁定</option>
+                </select>
+            </li>
+            <li>
+                <a href="javascript:search();" id="btnSearch" class="btn btn-primary">查询</a>
+            </li>
+        </ul>
+    </div>
+}
+<table id="Operate" toolbar="#toolbar"></table>
+<div id="OperateTable"> </div>
+@section scripts{
+
+    <script type="text/javascript">
+
+        var grid = $("#Operate");
+
+        //绑定数据
+        var _options = {
+            url: "UserOperateManage/List",
+            idField: "id",//主键列
+            sortName: "u_id",//默认排序字段
+            columns: [[
+                { field: 'id', checkbox: true },
+                { field: 'loginName', title: '登录名称', width: 100 },
+                { field: 'realName', title: '真实姓名', width: 100 },
+                { field: 'department', title: '部门', width: 100 },
+                { field: 'position', title: '职位', width: 100 },
+                { field: 'mobilenumber', title: '手机号码', width: 100 },
+                { field: 'emailAddress', title: '电子邮箱', width: 100 },
+                { field: 'qq', title: 'QQ', width: 100 },
+                {
+                    field: 'state', title: '状态', width: 50, formatter: function (val) {
+                        if (val == 1) {
+                            return '<span style="color:green">正常</span>';
+                        } else {
+                            return '<span style="color:red">锁定</span>';
+                        }
+                    }
+                },
+                { field: 'loginCount', title: '登录次数', width: 50 },
+                {
+                    field: "_operate",
+                    title: "操作",
+                    width: 200,
+                    align: "center",
+                    sortable: false,
+                    formatter: function (value, row, index) {
+                        return buildAction(row, index);
+                    }
+                }
+            ]],
+            onLoadSuccess() {
+                $('.button-action').linkbutton({ plain: 'true' });
+            }
+
+        };
+
+        dxgrid.datagrid(grid, _options);
+
+        //一键启用or禁用
+        function EnabledOrDisable(val) {
+
+            var id = $("input[name='id']:checked").map(function () {
+                return $(this).val();
+            }).get().join(',');
+
+            if (id == "") {
+                $.messager.alert('提示', '请选择要操作的数据!', "error");
+
+            } else {
+
+                $.ajax({
+                    url: G.http.buildUrl("UserOperateManage/EnabledOrDisable"),
+                    type: "post",
+                    data: { IdList: id, SearchState: val },
+                    success: function (data) {
+                        if (data == 1) {
+                            dialog.closeMessager('提示', '操作成功!', "Operate");
+                            return true;
+                        }
+                        else {
+                            $.messager.alert('提示', '操作失败!', "error");
+                            return false;
+                        }
+                    }
+                })
+            }
+        };
+
+        //查询
+        window.search = function () {
+            $('#Operate').datagrid("load",
+                {
+                    SearchType: $.trim($("#searchType").combobox("getValue")),
+                    SearchKey: $.trim($("#searchKey").textbox("getValue")),
+                    SearchState: $.trim($("#searchState").combobox("getValue"))
+                });
+        };
+
+        //添加
+        function create() {
+
+            var buttons = [
+                {
+                    text: '保存',
+                    iconCls: 'icon-save',
+                    handler: function () {
+                        save();
+                    }
+                }
+            ];
+            dialog.openPopup('#OperateTable', '录入运营信息', '/UserManage/CreateorEdit', buttons);
+        }
+
+        //修改
+        function Edit(index) {
+            var row = _grid.getRowByIndex(grid, index);
+
+            var id = row.id;
+            var buttons = [
+                {
+                    text: '修改',
+                    iconCls: 'icon-save',
+                    handler: function () {
+                        Edits();
+                    }
+                }
+            ];
+            dialog.openPopup('#OperateTable', '修改运营信息', '/UserManage/CreateorEdit?id=' + id + '', buttons);
+        }
+
+
+    </script>
+}
+
+
+
+
+

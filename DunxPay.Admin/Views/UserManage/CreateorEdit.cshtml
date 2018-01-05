@@ -1,0 +1,168 @@
+﻿
+@{
+    ViewBag.Title = "运营";
+    Layout = "~/Views/Shared/_layout_form.cshtml";
+}
+<form id="dx-form" class="dx-form" method="post">
+    <input type="hidden" id="dxClientId" name="id" value="@((int)DunxPay.Global.Enums.DxClient.Administrator)" />
+    <input type="hidden" id="id" name="id" value="" />
+    <div class="form-group">
+        <label>
+            <span class="form-group-label">用户角色:</span>
+            <input id="roleId" value="" name="roleId" />
+        </label>
+    </div>
+    <div class="form-group">
+        <label>
+            <span class="form-group-label">登录名:</span>
+            <input id="inputLoginName" class="easyui-textbox easyui-validatebox " name="loginName" type="text" data-options="required:true" />
+        </label>
+    </div>
+    <div class="form-group">
+        <label>
+            <span class="form-group-label">密码:</span>
+            <input id="inputPwd" class="easyui-textbox easyui-validatebox " name="pwd" type="password" data-options="required:true" />
+        </label>
+    </div>
+    <div class="form-group">
+        <label>
+            <span class="form-group-label">确认密码:</span>
+            <input id="inputPwdTrue" class="easyui-textbox easyui-validatebox " name="pwd" type="password" data-options="required:true" />
+        </label>
+    </div>
+    <div class="form-group">
+        <label>
+            <span class="form-group-label">真实姓名:</span>
+            <input id="inputRealName" class="easyui-textbox easyui-validatebox " name="realName" type="text" data-options="required:true" />
+        </label>
+    </div>
+    <div class="form-group">
+        <label>
+            <span class="form-group-label">部门:</span>
+            <input id="inputDepartment" class="easyui-textbox easyui-validatebox " name="department" type="text" data-options="required:true" />
+        </label>
+    </div>
+    <div class="form-group">
+        <label>
+            <span class="form-group-label">部职位:</span>
+            <input id="inputPosition" class="easyui-textbox easyui-validatebox " name="position" type="text" data-options="required:true" />
+        </label>
+    </div>
+    <div class="form-group">
+        <label>
+            <span class="form-group-label">手机号码:</span>
+            <input id="mobilenumber" class="easyui-textbox easyui-validatebox " name="mobilenumber" type="text" data-options="required:true" />
+        </label>
+    </div>
+    <div class="form-group">
+        <label>
+            <span class="form-group-label">邮箱地址:</span>
+            <input id="emailaddress" class="easyui-textbox easyui-validatebox " name="emailAddress" type="text" data-options="required:true" />
+        </label>
+    </div>
+    <div class="form-group">
+        <label>
+            <span class="form-group-label">QQ:</span>
+            <input id="qq" class="easyui-textbox easyui-validatebox " name="qq" type="text" data-options="required:true" />
+        </label>
+    </div>
+</form>
+@section scripts{
+
+    <script type="text/javascript">
+
+        var id = parseInt('@Request.QueryString["id"]');
+
+        //加载所有运营角色
+        $('#roleId').combobox({
+            url: G.http.buildPublicUrl("combobox/GetRole/" + $("#dxClientId").val() + ""),
+            method: 'get',
+            valueField: 'id',
+            textField: 'text',
+            editable: false,
+            required: true,
+            onLoadSuccess:
+                function () {
+                    if (id > 0) {
+                        $("#id").val('@Request.QueryString["id"]');
+                        $('#dx-form').form('load', G.http.buildUrl("UserOperateManage/Edit/" + $("#id").val() + ""));
+                    }
+                }
+        });
+
+        //保存
+        function save() {
+
+            var roleId = $("#roleId").val()
+            if (roleId == 0) {
+                $.messager.alert('警告', '请选择用户角色！');
+                return false;
+            }
+
+            var form = $("#dx-form");
+            if (!form.form("validate")) {
+                $.messager.alert('警告', '必填项没有填写完整！');
+                return false;
+            }
+
+            var inputPwd = $("#inputPwd").val();
+            var inputPwdTrue = $("#inputPwdTrue").val();
+
+            if ($.trim(inputPwd) != $.trim(inputPwdTrue)) {
+                $.messager.alert('警告', '二次输入的密码不相同！');
+                return false;
+            }
+
+            form.ajaxSubmit({
+                url: G.http.buildUrl("UserOperateManage/create"),
+                type: 'post',
+                success: function (data) {
+                    if (data.isSuccess) {
+                        dialog.closePopup("提示", data.message, "OperateTable", "Operate");
+                    } else {
+                        $.messager.alert('提示', data.message);
+                    }
+                }
+            });
+        }
+
+
+        //修改
+        function Edits() {
+
+            var roleId = $("#roleId").val()
+            if (roleId == 0) {
+                $.messager.alert('警告', '请选择用户角色！');
+                return false;
+            }
+            var form = $("#dx-form");
+            if (!form.form("validate")) {
+                $.messager.alert('警告', '必填项没有填写完整！');
+                return false;
+            }
+
+            var inputPwd = $("#inputPwd").val();
+            var inputPwdTrue = $("#inputPwdTrue").val();
+
+            if ($.trim(inputPwd) != $.trim(inputPwdTrue)) {
+                $.messager.alert('警告', '二次输入的密码不相同！');
+                return false;
+            }
+
+            form.ajaxSubmit({
+                url: G.http.buildUrl("UserOperateManage/Edit"),
+                type: 'post',
+                success: function (data) {
+                    if (data.isSuccess) {
+                        dialog.closePopup("提示", data.message, "OperateTable", "Operate");
+                    } else {
+                        $.messager.alert('提示', data.message);
+                    }
+                }
+            });
+        }
+
+    </script>
+
+
+}

@@ -1,0 +1,289 @@
+﻿
+@{
+    ViewBag.Title = "list";
+    Layout = "~/Views/Shared/_layout_list.cshtml";
+}
+
+<body class="easyui-layout" style="width: 100%; height: 100%;">
+    <div data-options="region:'west',split:false,border:false" style="width: 60%">
+        <table id="tableModule" toolbar="#toolbar"></table>
+        <div id="addModule" style="display: none"> </div>
+    </div>
+    <div data-options="region:'center',split:false,border:false" style="width: 38%; margin-left: 20px;">
+        <input type="hidden" id="id" name="id" value="" />
+        <div id="toolbar1" class="toolbar">
+            <div id="toolbar_buttons" class="toolbar_buttons">
+                <span> <a   class="easyui-linkbutton" data-options="iconCls:'icon-add'" onclick="addModuleAction()">新增</a> </span>
+                <span> <a  class="easyui-linkbutton" data-options="iconCls:'icon-ok'" onclick="UpdateModuleAction(1)">一键启用</a> </span>
+                <span> <a  class="easyui-linkbutton" data-options="iconCls:'icon-no'" onclick="UpdateModuleAction(0)">一键禁用</a> </span>
+            </div>
+        </div>
+        <table id="tableDxModuleAction" toolbar="#toolbar1"></table>
+        <div id="addModuleAction" style="display: none"> </div>
+    </div>
+</body>
+@section scripts{
+    <script src="~/assets/easyui/datagrid-detailview.js"></script>
+    <script>
+        //树形模块
+        $("#tableModule").treegrid({
+            url: G.http.buildUrl("module/treeList"), //后台加载地址
+            idField: 'id',
+            treeField: 'name',
+            rownumbers: false,
+            pagination: false,
+            selectOnCheck: true,
+            singleSelect:false,
+            columns: [
+                [
+                    { field: 'id', checkbox: true },
+                    { field: 'name', title: '模块名称', width: 200, sortable: true, align: 'center', resizable: true, fixed: true },
+                    { field: 'requestUrl', title: '请求路径', width: 400, align: 'center' },
+                    { field: 'sort', title: '排序', width: 80, align: 'center', sortable: true },
+                    {
+                        field: 'isEnabled', title: '状态', width: 80, align: 'center', sortable: true,
+                        formatter: function (value) {
+                            if (value) {
+                                return "<font style='color:green' >正常 </font>";
+                            } else {
+                                return "<font style='color:red' >锁定 </font>";
+                            }
+                        }
+                    },
+                    {
+                        field: "_operate",
+                        title: "操作",
+                        width: 200,
+                        align: "center",
+                        sortable: false,
+                        formatter: function (value, row, index) {
+                            var tools = [];
+                            tools.push("<a  class='operate icon-information_frame button-action' data-options=\"iconCls: 'icon-edit'\"   onclick=\"Edit('" + row.id + "')\" >修改</a>");
+                            tools.push("<a  class='operate icon-information_frame button-action' data-options=\"iconCls: 'icon-edit'\"  onclick=\"Manger('" + row.id + "')\">管理操作码</a>");
+                            return tools.join("|");
+                        }
+                    }
+                ]
+            ],
+            onLoadSuccess() {
+                $('.button-action').linkbutton({ plain: 'true' });
+                $('#tableModule').treegrid('collapseAll');
+            }
+        });
+        //模块对应的操作码
+        var grid = $("#tableDxModuleAction");
+        grid.datagrid({
+            url: G.http.buildUrl("moduleAction/List"), //后台加载地址
+            method: "post", //请求类型(get/post)
+            border: true, //边框
+            autoRowHeight: false, //自动行高
+            fitColumns: true, //自适应网格(如果是 false 则显示横向滚动条)
+            striped: true, //奇偶行不同背景
+            nowrap: true,
+            pagination: true, ////True 就会在 datagrid 的底部显示分页栏
+            rownumbers: true, //显示行号
+            selectOnCheck: true,
+            idField: "id", //主键列
+            sortName: "createdOn", //默认排序字段
+            sortOrder: "desc", //默认排序(asc/desc)
+            columns: [//列头
+                [
+                    { field: 'id', checkbox: true },
+                    { field: 'name', title: '操作名称', width: 200 },
+                    { field: 'code', title: '操作码', width: 120, align: 'center', resizable: true, fixed: true },
+                    { field: 'sort', title: '排序', resizable: true, fixed: true,  align: 'center' },
+                    {
+                        field: 'isEnabled', title: '状态', width: 80, align: 'center',
+                        formatter: function (value) {
+                            if (value) {
+                                return "<font style='color:green' >正常 </font>";
+                            } else {
+                                return "<font style='color:red' >锁定 </font>";
+                            }
+                        }
+                    },
+                    {
+                        field: 'isButton', title: '是否按钮', width: 80, align: 'center',
+                        formatter: function (value) {
+                            if (value) {
+                                return "<font style='color:green' >是 </font>";
+                            } else {
+                                return "<font style='color:red' >否 </font>";
+                            }
+                        }
+                    },
+                    {
+                        field: "_operate",
+                        title: "操作",
+                        width: 200,
+                        align: "center",
+                        sortable: false,
+                        formatter: function (value, row, index) {
+                            var tools = [];
+                            tools.push("<a  class='operate icon-information_frame button-action' data-options=\"iconCls: 'icon-edit'\"   onclick=\"EditAction('" + row.id + "')\" >修改</a>");
+                            return tools;
+                        }
+                    }
+                ]
+            ],
+            view: detailview,
+            detailFormatter: function (rowIndex, rowData) {
+                var type = "";
+                switch (rowData.buttonType) {
+                case 1:
+                    type = "工具栏按钮";
+                    break;
+                case 2:
+                    type = "表格按钮";
+                    break;
+                default:
+                }
+                return '<div class="dcnt-tab"> <table class="table-lst"><tr>' +
+                    '<td>' +
+                    '按钮类型: ' + type +
+                    '</td>' +
+                    '<td>js操作函数: ' +
+                    rowData.jsOperatingFunction +
+                    '</td>' + '<td> 按钮图标' + rowData.buttonIcon + '</td>' +
+                    '</tr>' + '</table> </div>';
+            },
+            pageNumber: 1, //初始化页码
+            remoteSort: true, //是否数据源排序
+            pageSize: 20, //初始化分页大小
+            pageList: [10, 20, 30, 40, 50, 60, 70, 80], //初始化页面尺寸的选择列表
+            loadMsg: "正在查询数据...", //加载提示
+            onLoadSuccess() {
+                $('.button-action').linkbutton({ plain: 'true' });
+            }
+
+        });
+
+        //添加模块
+        function create() {
+            var buttons = [
+                {
+                    text: '保存',
+                    iconCls: 'icon-save',
+                    handler: function () {
+                        save();
+                    }
+                }
+
+            ];
+            dialog.openPopup('#addModule', '新增模块', '/Module/Create', buttons);
+        }
+        //修改模块
+        function Edit(id) {
+            var buttons = [
+                {
+                    text: '修改',
+                    iconCls: 'icon-save',
+                    handler: function () {
+                        Save();
+                    }
+                }
+            ];
+            dialog.openPopup('#addModule', '修改模块', '/Module/Edit?id=' + id + '', buttons);
+        }
+        //管理操作码
+        function Manger(id) {
+            $("#id").val(id);
+            $("#tableDxModuleAction").datagrid('load',
+                { moduleIdentifyCode: id });
+        }
+        //添加模块操作码
+        function addModuleAction() {
+            var id = $("#id").val();
+            if (id == null || id == "") {
+                $.messager.alert('警告', '请选择对应的模块');
+                return;
+            } else {
+                var buttons = [
+                    {
+                        text: '保存',
+                        iconCls: 'icon-save',
+                        handler: function () {
+                            saveMdouleAction(id);
+                        }
+                    }
+                ];
+                dialog.openPopup('#addModuleAction', '新增模块操作码', '/ModuleAction/Create', buttons);
+            }
+        }
+        //修改模块
+        function EditAction(id) {
+            var buttons = [
+                {
+                    text: '保存',
+                    iconCls: 'icon-save',
+                    handler: function () {
+                        EditMdouleAction();
+                    }
+                }
+            ];
+            dialog.openPopup('#addModuleAction', '修改模块操作码', '/ModuleAction/Edit?id=' + id + '', buttons);
+            
+        }
+
+        function EnabledOrDisable(val) {
+            var checkRows = $('#tableModule').treegrid('getChecked');
+            var id = [];
+            $.each(checkRows,
+                function (i, checkRow) {
+                    id[i] = checkRow.id;
+                });
+            var ids = id.join(',');
+            if (ids == "") {
+                $.messager.alert('提示', '请选择要操作的数据!', "error");
+
+            } else {
+                $.ajax({
+                    url: G.http.buildUrl("Module/EnabledOrDisable"),
+                    type: "post",
+                    data: { IdList: ids, SearchState: val },
+                    success: function (data) {
+                        if (data.isSuccess) {
+                            dialog.closeMessager('提示', '操作成功!',"tableModule",1);
+                            return true;
+                        } else {
+                            $.messager.alert('提示', '操作失败!', "error");
+                            return false;
+                        }
+                    }
+                });
+            } 
+        }
+
+        //一键启用or禁用模块操作码
+        function UpdateModuleAction(val) {
+            var checkRows = $('#tableDxModuleAction').datagrid('getChecked');
+            var id =[];
+            $.each(checkRows,
+                function (i, checkRow) {
+                    id[i] = checkRow.id;
+                });
+            var ids = id.join(',');
+            if (ids == "") {
+                $.messager.alert('提示', '请选择要操作的数据!', "error");
+
+            } else {
+                $.ajax({
+                    url: G.http.buildUrl("ModuleAction/EnabledOrDisable"),
+                    type: "post",
+                    data: { IdList: ids, SearchState: val },
+                    success: function (data) {
+                        console.info(data);
+                        if (data.isSuccess ) {
+                            dialog.closeMessager('提示', '操作成功!',"tableDxModuleAction");
+                            return true;
+                        } else {
+                            $.messager.alert('提示', '操作失败!', "error");
+                            return false;
+                        }
+                    }
+                });
+            }
+        };
+
+    </script>
+}

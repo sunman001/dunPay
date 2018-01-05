@@ -1,0 +1,162 @@
+﻿
+@{
+    ViewBag.Title = "CREATE";
+    Layout = "~/Views/Shared/_layout_form.cshtml";
+}
+<form id="dx-ModuleAction" class="dx-form" method="post">
+    <div class="form-group">
+        <label>
+            <span class="form-group-label">操作名称:</span>
+            <input  id="name" name="name" />
+            @*<input id="name" class="easyui-textbox easyui-validatebox" type="text" data-options="required:true" />*@
+        </label>
+    </div>
+    <div class="form-group">
+        <label>
+            <span class="form-group-label">操作码:</span>
+            <input id="code" class="easyui-textbox" type="text" data-options="required:true" />
+        </label>
+    </div>
+    <div class="form-group">
+        <label>
+            <span class="form-group-label">是否是按钮:</span>
+            <input id="isButton" class="easyui-switchbutton" data-options="onText:'是',offText:'否',checked:true" onclick="getvalue()">
+
+        </label>
+    </div>
+    <div class="form-group" id="buttonTypeDiv">
+        <label>
+            <span class="form-group-label">按钮类型:</span>
+            <select id="buttonType" class="easyui-combobox">
+                <option value="0">请选择按钮类型</option>
+                <option value="1">工具栏</option>
+                <option value="2">表格</option>
+            </select>
+        </label>
+    </div>
+    <div class="form-group" id="jsOperatingFunctionDiv">
+        <label>
+            <span class="form-group-label">js操作函数:</span>
+            <input id="jsOperatingFunction" class="easyui-textbox" type="text" />
+        </label>
+    </div>
+    <div class="form-group" id="buttonIconDiv">
+        <label>
+            <span class="form-group-label">按钮图标:</span>
+            <input id="buttonIcon" class="easyui-textbox" type="text" />
+        </label>
+    </div>
+    <div class="form-group">
+        <label>
+            <span class="form-group-label">排序:</span>
+            <input id="sort" class="easyui-textbox easyui-numberbox " value="0" type="text" name="name" data-options="required:true" />
+        </label>
+    </div>
+    <div class="form-group">
+        <p style="color: red; font-size: 20px;">备注：<br/>
+            1、 如是表格按钮，js操作函数不要带括号。<br/>
+            2、同一个模块操作码不能重复  
+        </p>
+    </div>
+</form>
+@section scripts{
+    <script type="text/javascript">
+        $('#name').combobox({
+            url: G.http.buildPublicUrl("combobox/GetBasicModuleAction"),
+            method: 'post',
+            valueField: 'id',
+            textField: 'text',
+            required: true
+        });
+        //当选择平台时 重新加载模块信息
+        $('#name').combobox({
+            onChange: function (Value) {
+                if (Value>0) {
+                    $.ajax({
+                        url: G.http.buildUrl("moduleAction/FindBasicMduleAcionById/" + Value + ""),
+                        dataType: 'json',
+                        type: 'post',
+                        success: function (data) {
+                            $("#code").textbox('setValue', data.code);
+                            $("#buttonIcon").textbox('setValue', data.icon);
+                        }
+                    });
+                }
+                
+            }
+        });
+        $(function () {
+            getvalue();
+        });
+        function getvalue() {
+            var isButton = $("#isButton").switchbutton("options").checked;
+            if (!isButton) {
+                $("#buttonTypeDiv").hide();
+                $("#jsOperatingFunctionDiv").hide();
+                $("#buttonIconDiv").hide();
+                $("#jsOperatingFunction").textbox('setValue', "");
+                $("#buttonIcon").textbox('setValue', "");
+            } else {
+                $("#buttonTypeDiv").show();
+                $("#jsOperatingFunctionDiv").show();
+                $("#buttonIconDiv").show();
+            }
+        }
+        //添加模块操作码
+        function saveMdouleAction(id) {
+            var moduleIdentifyCode = id;
+            var name = $.trim($("#name").combobox("getText"));
+            //alert(name);
+            var code = $.trim($("#code").textbox("getValue"));
+            var isButton = $("#isButton").switchbutton("options").checked;
+            var buttonType = $.trim($("#buttonType").combobox("getValue"));
+            var jsOperatingFunction = $.trim($("#jsOperatingFunction").textbox("getValue"));
+            var buttonIcon = $.trim($("#buttonIcon").textbox("getValue"));
+            var sort = $.trim($("#sort").textbox("getValue"));
+            if (isButton) {
+                if (buttonType <= 0) {
+                    $.messager.alert('警告', '按钮类型必须选择！');
+                    return;
+                }
+                if (jsOperatingFunction == "") {
+                    $.messager.alert('警告', 'js函数不能为空！');
+                    return;
+                }
+                if (buttonIcon == "") {
+                    $.messager.alert('警告', '按钮图标不能为空！');
+                    return;
+                }
+            }
+            var data = {
+                moduleIdentifyCode: moduleIdentifyCode,
+                name: name,
+                code: code,
+                isButton: isButton,
+                buttonType: buttonType,
+                jsOperatingFunction: jsOperatingFunction,
+                buttonIcon: buttonIcon,
+                sort: sort
+            };
+            var form = $("#dx-ModuleAction");
+            if (!form.form("validate")) {
+                $.messager.alert('警告', '必填项没有填写完整！');
+                return;
+            } else {
+                $.ajax({
+                    url: G.http.buildUrl("ModuleAction/Create"),
+                    dataType: 'json',
+                    type: 'post',
+                    data: data,
+                    success: function (response) {
+                        if (response.isSuccess) {
+                            dialog.closePopup("提示", response.message, "addModuleAction", "tableDxModuleAction");
+                        } else {
+                            $.messager.alert('提示', response.message);
+                        }
+                    }
+                });
+            }
+        }
+
+    </script>
+}

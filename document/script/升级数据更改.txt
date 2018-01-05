@@ -1,0 +1,3 @@
+数据库:dunx_base 
+1.jmp_locuser
+	添加字段:u_type

@@ -1,0 +1,143 @@
+﻿@using DunxPay.Admin.Extensions.Html
+@{
+    Layout = "~/views/shared/_layout_list.cshtml";
+    ViewBag.Title = "运营平台操作日志";
+}
+@section toolbar_search
+{
+    <div id="select-txt">
+        <ul class="frm-ul clearfix">
+            <li>
+                <select id="type" class="easyui-combobox" editable="false" style="width: 100px; height: 30px;">
+                    <option value="1">管理员编号</option>
+                    <option value="2">IP地址</option>
+                    <option value="3">管理员账号</option>
+                </select>
+            </li>
+            <li>
+                <input id="txtseach" class="easyui-textbox" style="width: 150px; height: 30px;" data-options="prompt:'请输入关键字...'," />
+            </li>
+            <li>
+                <select id="logtype" class="easyui-combobox" editable="false" style="width: 100px; height: 30px;">
+                    <option value="0">请选择日志类型</option>
+                    <option value="1">新增</option>
+                    <option value="2">修改</option>
+                    <option value="3">操作</option>
+                    <option value="4">登录</option>
+                    <option value="5">访问</option>
+                </select>
+            </li>
+            <li>
+                <a href="javascript:search();" id="btnSearch" class="btn btn-primary" >查询</a>
+            </li>
+        </ul>
+    </div>
+}
+<table id="tableLog" toolbar="#toolbar"></table>
+@section scripts{
+    <script src="~/assets/easyui/datagrid-detailview.js"></script>
+    <script type="text/javascript">
+        var grid = $("#tableLog");
+        grid.datagrid({
+            url: G.http.buildUrl("Logger/list"), //后台加载地址
+            method: "post", //请求类型(get/post)
+            border: true, //边框
+            autoRowHeight: false, //自动行高
+            fitColumns: true, //自适应网格(如果是 false 则显示横向滚动条)
+            striped: true, //奇偶行不同背景
+            nowrap: true,
+            pagination: true, ////True 就会在 datagrid 的底部显示分页栏
+            rownumbers: true, //显示行号
+            idField: "id", //主键列
+            sortName: "createdOn", //默认排序字段
+            sortOrder: "desc", //默认排序(asc/desc)
+            columns: [//列头
+                [
+                    { field: 'id', title: 'Id', width: 30, sortable: true, align: 'center' },
+                    { field: 'userId', title: '用户Id', width: 50, sortable: true, align: 'center' },
+                    {
+                        field: 'logType',
+                        title: '日志类型',
+                        width: 100,
+                        resizable: true,
+                        fixed: true,
+                        formatter: function(value) {
+                            switch (value) {
+                            case 1:
+                                return " 新增";
+                            case 2:
+                                return " 修改";
+                            case 3:
+                                return " 操作";
+                            case 4:
+                                return " 登录";
+                            case 5:
+                                return " 访问";
+                            default:
+                                return "新增";
+                            }
+                        }
+
+                    },
+                    { field: 'summary', title: '简要说明', width: 300 },
+                    {
+                        field: 'createdOn',
+                        title: '日志日期',
+                        width: 300,
+                        align: 'center',
+                        sortable: true,
+                        //格式化时间操作
+                        formatter: function(value) {
+                            return value.toString("yyyy-MM-dd");
+                        }
+                    },
+                    {
+                        field: "_operate",
+                        title: "操作",
+                        width: 200,
+                        align: "center",
+                        sortable: false,
+                        formatter: function (obj, row) {
+                           return  buildAction();
+
+                        }
+                    }
+                ]
+            ],
+            view: detailview,
+            detailFormatter: function(rowIndex, rowData) {
+                return '<table><tr>' +
+                    '<td style="border:0">' +
+                    '<p>IP: ' +
+                    rowData.ipAddress +
+                    '</p>' +
+                    '<p>详细错误: ' +
+                    rowData.message +
+                    '</p>' +
+                    '</td>' +
+                    '</tr></table>';
+            },
+            pageNumber: 1, //初始化页码
+            remoteSort: true, //是否数据源排序
+            pageSize: 20, //初始化分页大小
+            pageList: config.grid.pageList, //初始化页面尺寸的选择列表
+            loadMsg: "正在查询数据...", //加载提示
+            onLoadSuccess() {
+                $('.button-action').linkbutton({ plain: 'true' });
+            }
+        });
+        //查询
+        window.search = function() {
+            grid.datagrid("load",
+                {
+                    field: $.trim($("#type").combobox("getValue")),
+                    txtseach: $.trim($("#txtseach").textbox("getValue")),
+                    logtype: $.trim($("#logtype").combobox("getValue"))
+                });
+        };
+
+        function create() {
+            alert(111);
+        }
+    </script>
+}

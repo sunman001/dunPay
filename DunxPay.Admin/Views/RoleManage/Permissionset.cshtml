@@ -1,0 +1,145 @@
+﻿@{
+    ViewBag.Title = "Permissionset";
+    Layout = null;
+}
+<table id="tableModuleAction"></table>
+<input type="hidden" id="id" name="id" value="" />
+<script>
+    $("#id").val('@Request.QueryString["id"]');
+     var id = $("#id").val();
+    $("#tableModuleAction").treegrid({
+        url: G.http.buildUrl("RoleOperateManage/Permissionset?roleId="+id+""), //后台加载地址
+        idField: 'id',
+        treeField: 'name',
+        rownumbers: false,
+        pagination: false,
+        singleSelect: false,
+        fitColumns: false,
+        autoRowHeight: false,
+        striped: true,
+        nowrap:false,
+        columns: [
+            [ {
+                    field: 'name',
+                    title: '模块名称',
+                    width: 200,
+                    sortable: true,
+                    align: 'center',
+                    resizable: true,
+                    fixed: true
+                },
+                {
+                    field: 'dxModuleActionModel',
+                    title: '操作码',
+                    width: 400,
+                    sortable: true,
+                    align: 'center',
+                    resizable: true,
+                    fixed: true,
+                    formatter: function(value, row) {
+                        var tools = [];
+                        if (row.dxModuleActionModel.length>0) {
+                            $.each(row.dxModuleActionModel,
+                                function (i, perm) {
+                                    if (perm.checked) {
+                                        tools.push("<input name='moduleAction' data-identifyCode='" + row.id + "' data-code='" + perm.code +"'  type='checkbox'   class='grid-check'checked=true> " +perm.name + "</input>");
+                                    }
+                                    else {
+                                        tools.push("<input name='moduleAction' data-identifyCode='" + row.id + "' data-code='" + perm.code +"'  type='checkbox'   class='grid-check' > " + perm.name +"</input>");
+                                    }
+                                });
+                        }
+
+                        return tools.join("&nbsp;");
+                    }
+                },
+                {
+                    field: "_operate",
+                    title: "操作",
+                    width: 200,
+                    align: "center",
+                    sortable: false,
+                    formatter: function (value, row, index) {
+                        var tools = [];
+                        if (row.dxModuleActionModel.length > 0) {
+                           // console.info(row);
+                            tools.push("<input name='unselect'  type='checkbox'  data-id='" + row.id + "'  class='grid-check' onclick='unselect(\"" + row.id +"\")' >全选/反选</input>");
+
+                        } return tools.join("&nbsp;");
+                    }
+                }
+            ]
+        ],
+        onLoadSuccess() {
+            // $('#tableModuleAction').treegrid('collapseAll');
+        },
+        onCheck(rowIndex, rowData) {
+           // console.info(rowData);
+        }
+    });
+    //权限授权
+    function save() {
+        var id = $("#id").val();
+        var dxPerMissionAction = [];
+        var moduleAction = document.getElementsByName("moduleAction");
+        for (var i = 0; i < moduleAction.length; i++) {
+            if (moduleAction[i].checked) {
+                dxPerMissionAction.push({
+                    moduleIdentifyCode: $(moduleAction[i]).attr("data-identifycode"),
+                    code: $(moduleAction[i]).attr("data-code")
+                });
+            }
+        }
+   var data = {
+                 roleId: id,
+                 dxPerMissionAction: dxPerMissionAction
+            };
+
+            $.ajax({
+                url: G.http.buildUrl("RoleOperateManage/Permissionsetopert"),
+                dataType: 'json',
+                type: 'post',
+                data: data,
+                success: function(response) {
+                    if (response.isSuccess) {
+                        dialog.closePopup("提示", response.message, "add", "RoleOperate");
+                    } else {
+                        $.messager.alert('提示', response.message);
+                    }
+                }
+            });
+
+    }
+    //全选/反选
+    function unselect(id) {
+        var target = $("input[data-id='" + id + "']");
+       // console.info(target);
+        //console.info(target[0].checked);
+            var moduleAction = document.getElementsByName("moduleAction");
+            for (var i = 0; i < moduleAction.length; i++) {
+                var identitycode = $(moduleAction[i]).attr("data-identifycode");
+                if (identitycode == id) {
+                    if (target[0].checked) {
+                        $(moduleAction[i]).attr('checked', true);
+                    } else {
+                        $(moduleAction[i]).attr('checked', false);   
+                    }
+                }
+                }
+    }
+    //全选所有
+    function qxchecked() {
+            var moduleAction = document.getElementsByName("moduleAction");
+            for (var i = 0; i < moduleAction.length; i++) {
+                $(moduleAction[i]).attr('checked', true);
+                }
+    }
+    //反选所有
+    function unchecked() {
+        var moduleAction = document.getElementsByName("moduleAction");
+        for (var i = 0; i < moduleAction.length; i++) {
+            $(moduleAction[i]).attr('checked', false);
+        } 
+    }
+
+</script>

@@ -1,0 +1,68 @@
+﻿@using DunxPay.Admin.Extensions.Html
+@{
+    Layout = "~/views/shared/_layout_list.cshtml";
+    ViewBag.Title = "仪表盘";
+}
+<div>
+    <div id="toolbar">
+        @*<a id="addId" class="easyui-linkbutton" data-action="CREATE" iconCls="icon-add" data-options="disabled:true" onclick="create()">创建</a>*@
+        @Html.Button("创建", "CREATE", "create", "icon-add", options: "plain:true")
+    </div>
+    <table id="dg" toolbar="#toolbar"></table>
+</div>
+@section scripts{
+    <script type="text/javascript">
+        $('#dg').datagrid({
+            url: G.http.buildUrl("module/list"), //后台加载地址
+            method: "post", //请求类型(get/post)
+            border: true, //边框
+            autoRowHeight: false, //自动行高
+            nowrap: true,
+            pagination: true, ////True 就会在 datagrid 的底部显示分页栏
+            rownumbers: true, //显示行号
+            idField: "id", //主键列
+            sortName: "createdOn", //默认排序字段
+            sortOrder: "desc", //默认排序(asc/desc)
+            fitColumns: true,
+            striped: true,
+            selectOnCheck: true,
+            columns: [
+                [
+                    { field: 'id', checkbox: true },
+                    { field: 'name', title: '名称', width: 100, sortable: true },
+                    { field: 'code', title: '编码', width: 100 },
+                    { field: 'requestUrl', title: '请求地址', width: 100 },
+                    {
+                        field: 'isEnabled', title: '是否可用', width: 80, align: 'center', sortable: true,
+                        formatter: function (value) {
+                            if (value) {
+                                return "<font style='color:green' >正常 </font>";
+                            } else {
+                                return "<font style='color:red' >锁定 </font>";
+                            }
+                        }
+
+                    }
+                ]
+            ]
+            //,
+            //toolbar: [
+            //    {
+            //        id: "addId",
+            //        text: "新增",
+            //        iconCls: "icon-add",
+            //        disabled: true,
+            //        actionCode:"CREATE",
+            //        handler: function () {
+            //            //回调函数
+            //            alert(111);
+            //        }
+            //    }
+            //]
+        });
+        function create() {
+            alert("create");
+        }
+        $('#addId').linkbutton({ disabled:true});
+    </script>
+}

@@ -1,0 +1,115 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{33293014-5F97-45F7-A0D2-AA4A388045E3}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>DunxPay.Repositories</RootNamespace>
+    <AssemblyName>DunxPay.Repositories</AssemblyName>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="ServiceStack.Interfaces">
+      <HintPath>..\libs\ServiceStack.OrmLite\net45\ServiceStack.Interfaces.dll</HintPath>
+    </Reference>
+    <Reference Include="ServiceStack.OrmLite">
+      <HintPath>..\libs\ServiceStack.OrmLite\net45\ServiceStack.OrmLite.dll</HintPath>
+    </Reference>
+    <Reference Include="ServiceStack.OrmLite.SqlServer">
+      <HintPath>..\libs\ServiceStack.OrmLite\net45\ServiceStack.OrmLite.SqlServer.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="BaseGenericRepository.cs" />
+    <Compile Include="DbConnectionFactory.cs" />
+    <Compile Include="GenericRepository.cs" />
+    <Compile Include="Impl\DunBase\JmpRisklevelallocationRepository.cs" />
+    <Compile Include="Impl\DunBase\JmpRisklevelRepository.cs" />
+    <Compile Include="Inter\DunBase\IJmpRisklevelallocationRepository.cs" />
+    <Compile Include="Impl\DunBase\AppRepository.cs" />
+    <Compile Include="Impl\DunBase\AppTypeRepository.cs" />
+    <Compile Include="Impl\DunBase\DxBasicsModuleActionRepository.cs" />
+    <Compile Include="Impl\DunBase\DxLoggerRepository.cs" />
+    <Compile Include="Impl\DunBase\DxModuleActionRepository.cs" />
+    <Compile Include="Impl\DunBase\DxModuleRepository.cs" />
+    <Compile Include="Impl\DunBase\DxPermissionActionRepository.cs" />
+    <Compile Include="Impl\DunBase\DxPermissionRepository.cs" />
+    <Compile Include="Impl\DunBase\DxRoleRepository.cs" />
+    <Compile Include="Impl\DunBase\DxUserRoleMappingRepository.cs" />
+    <Compile Include="Impl\DunBase\JmpLocuserRepository.cs" />
+    <Compile Include="Impl\DunBase\JmpUserRepository.cs" />
+    <Compile Include="Impl\DunBase\PaymodeRepository.cs" />
+    <Compile Include="Impl\DunBase\RbacRepository.cs" />
+    <Compile Include="Inter\DunBase\IAppRepository.cs" />
+    <Compile Include="Inter\DunBase\IAppTypeRepository.cs" />
+    <Compile Include="Inter\DunBase\IDxBasicsModuleActionRepository.cs" />
+    <Compile Include="Inter\DunBase\IDxLoggerRepository.cs" />
+    <Compile Include="Inter\DunBase\IDxModuleActionRepository.cs" />
+    <Compile Include="Inter\DunBase\IDxModuleRepository.cs" />
+    <Compile Include="Inter\DunBase\IDxPermissionActionRepository.cs" />
+    <Compile Include="Inter\DunBase\IDxPermissionRepository.cs" />
+    <Compile Include="Inter\DunBase\IDxRoleRepository.cs" />
+    <Compile Include="Inter\DunBase\IDxUserRoleMappingRepository.cs" />
+    <Compile Include="Inter\DunBase\IJmpLocuserRepository.cs" />
+    <Compile Include="Inter\DunBase\IJmpRisklevelRepository.cs" />
+    <Compile Include="Inter\DunBase\IJmpUserRepository.cs" />
+    <Compile Include="Inter\DunBase\IPaymodeRepository.cs" />
+    <Compile Include="Inter\DunBase\IRbacRepository.cs" />
+    <Compile Include="IRepository.cs" />
+    <Compile Include="LogGenericRePository.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Impl\Rbac\" />
+    <Folder Include="Inter\Rbac\" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\DunxPay.Domain\DunxPay.Domain.csproj">
+      <Project>{C19B3A4B-2A7B-40D6-9584-909B512B2F37}</Project>
+      <Name>DunxPay.Domain</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\DunxPay.Global\DunxPay.Global.csproj">
+      <Project>{E744EE50-E728-4FC6-B9D4-5A763D96BC89}</Project>
+      <Name>DunxPay.Global</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\DunxPay.ViewModel\DunxPay.ViewModel.csproj">
+      <Project>{F3FC8BA3-05E9-4AEA-A306-9862B3BF6559}</Project>
+      <Name>DunxPay.ViewModel</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Infrastructure\DunxPay.Infrastructure.csproj">
+      <Project>{B88A41A3-9F2B-4743-8107-8154CAFD04E3}</Project>
+      <Name>DunxPay.Infrastructure</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>

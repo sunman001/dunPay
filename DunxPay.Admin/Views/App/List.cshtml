@@ -1,0 +1,323 @@
+﻿
+@{
+    ViewBag.Title = "List";
+    Layout = "~/Views/Shared/_layout_list.cshtml";
+}
+
+@section toolbar_search
+{
+    <div id="select-txt">
+        <ul class="frm-ul clearfix">
+            <li>
+                <select id="searchType" class="easyui-combobox" editable="false" style="width: 100px; height: 30px;">
+                    <option value="1">应用编号</option>
+                    <option value="2">应用名称</option>
+                    <option value="3">所属商户</option>
+                    <option value="4">应用KEY</option>
+                </select>
+            </li>
+            <li>
+                <input id="sea_name" class="easyui-textbox" style="width: 150px; height: 30px;" data-options="prompt:'请输入关键字...'," />
+            </li>
+            <li>
+                <select id="selectState" class="easyui-combobox" editable="false" style="width: 100px; height: 30px;">
+                    <option value="-1">状态</option>
+                    <option value="0">锁定</option>
+                    <option value="1">正常</option>
+                </select>
+            </li>
+            <li>
+                <select id="auditstate" class="easyui-combobox" editable="false" style="width: 100px; height: 30px;">
+                    <option value="-1">审核状态</option>
+                    <option value="0">等待审核</option>
+                    <option value="1">审核通过</option>
+                    <option value="2">审核未通过</option>
+                </select>
+            </li>
+            <li>
+                <select id="platformid" class="easyui-combobox" editable="false" style="width: 100px; height: 30px;">
+                    <option value="0">关联平台</option>
+                    <option value="1">安卓</option>
+                    <option value="2">苹果</option>
+                    <option value="3">H5</option>
+                </select>
+            </li>
+            <li>
+                <select id="r_id" class="easyui-combobox" editable="false" style="width: 100px; height: 30px;">
+                    <option value="0">风险等级</option>
+                    <option value="1">高</option>
+                    <option value="2">中</option>
+                    <option value="3">低</option>
+                </select>
+            </li>
+            <li>
+                <input id="appType" style="width: 100px; height: 30px;">
+            </li>
+            <li>
+                <input id="paytype" style="width: 100px; height: 30px;">
+            </li>
+            <li>
+                <a href="javascript:search();" id="btnSearch" class="btn btn-primary">查询</a>
+            </li>
+        </ul>
+    </div>
+
+}
+<table id="tableApp" toolbar="#toolbar"></table>
+<div id="addApp"> </div>
+@section scripts{
+    <script src="~/assets/easyui/datagrid-detailview.js"></script>
+    <script type="text/javascript">
+   
+        //加载正在用的应用类型
+        $('#appType').combobox({
+            url: G.http.buildPublicUrl("combobox/GetAppTypePay"),
+            method: 'post',
+            valueField: 'id',
+            textField: 'text',
+            editable:false
+
+        });
+        $('#paytype').combobox({
+            url: G.http.buildPublicUrl("combobox/GetPaymode"),
+            method: 'post',
+            valueField: 'id',
+            textField: 'text',
+            editable:false
+
+        });
+        var grid = $("#tableApp");
+        var _options = {
+            url: "app/list", //后台加载地址
+            idField: "a_id", //主键列
+            sortName: "a_id", //默认排序字段
+            checkOnSelect: false,
+            columns: [//列头
+                [
+                    { field: '', checkbox: true },
+                    { field: 'a_id', title: '应用编号', width: 80, align: 'left', sortable: true },
+                    { field: 'a_name', title: '应用名称', width: 100, align: 'left', sortable: true },
+                    {  field: 't_name', title: '所属应用类型',width: 200, sortable: true,align: 'left',resizable: true, fixed: true},
+                    {  field: 'u_realname', title: '所属商户', width: 200, resizable: true, fixed: true, sortable: true, align: 'left' },
+                    {  field: 'a_platform_id', title: '关联平台', width: 200, resizable: true, fixed: true, sortable: true,
+                        align: 'left',
+                        formatter(value) {
+                            switch (value) {
+                            case 1:
+                                return "<span>安卓</span>";
+                               
+                            case 2:
+                                return "<span>苹果</span>";
+                               
+                            case 3:
+                                return "<span>H5</span>";
+                              
+                            }
+                        }
+                    },
+                    {
+                        field: 'a_auditstate', title: '关联平台', width: 200, resizable: true, fixed: true, sortable: true,
+                        align: 'left',
+                        formatter(value) {
+                            switch (value) {
+                            case 0:
+                                    return " <font style='color:red' >等待审核</font>";
+                                
+                            case 1:
+                                    return " <font style='color:green' >审核通过</font>";
+                               
+                            case 2:
+                                    return "<font style='color:red' >审核未通过</span>";
+                                
+                            }
+                        }
+                    },
+                    { field: 'a_state',title: '状态',width: 100,align: 'left',
+                        formatter: function(value) {
+                            if (value == 1) {
+                                return "<font style='color:green' >正常 </font>";
+                            } else {
+                                return "<font style='color:red' >锁定 </font>";
+                            }
+
+                        }
+                    },
+                    {
+                        field: "_operate",
+                        title: "操作",
+                        width: 300,
+                        align: "center",
+                        sortable: false,
+                        formatter: function(value, row, index) {
+                            return buildAction(row, index);
+                        }
+                    }
+                ]
+            ],
+            view: detailview,
+            detailFormatter: function (rowIndex, rowData) {
+                return '<div class="dcnt-tab"> <table class="table-lst"><tr>' +
+                    '<td>' +
+                    ' 应用key: ' +
+                    rowData.a_key +
+                    '</td>' +
+                    '<td>应用秘钥: ' +
+                    rowData.a_secretkey +
+                    '</td>' + '<td> 风险等级' + rowData.r_id + '</td>' +
+                    '</tr>' +
+                    '</table> </div>';
+            },
+            onLoadSuccess() {
+                $('.button-action').linkbutton({ plain: 'true' });
+            }
+
+        };
+        dxgrid.datagrid(grid, _options);
+        //查询
+        window.search = function() {
+            grid.datagrid("load",
+                {
+                    paytype: $.trim($("#paytype").combobox("getValue")),
+                    rid: $.trim($("#r_id").combobox("getValue")),
+                    platformid: $.trim($("#platformid").combobox("getValue")),
+                    auditstate: $.trim($("#auditstate").combobox("getValue")),
+                    seaName: $.trim($("#sea_name").textbox("getValue")),
+                    type: $.trim($("#searchType").combobox("getValue")),
+                    selectState: $.trim($("#selectState").combobox("getValue")),
+                    appType: $.trim($("#appType").combobox("getValue"))
+                });
+        };
+        //添加
+        function create() {
+            var buttons = [
+                {
+                    text: '保存',
+                    iconCls: 'icon-save',
+                    handler: function() {
+                        save();
+                    }
+                }
+            ];
+            dialog.openPopup('#addApp', '新增应用', '/App/Create', buttons);
+        }
+
+        //修改
+        function eidt(index) {
+            var row = _grid.getRowByIndex(grid, index);
+            var id = row.a_id;
+            var buttons = [
+                {
+                    text: '修改',
+                    iconCls: 'icon-save',
+                    handler: function() {
+                        Edits();
+                    }
+                }
+            ];
+            dialog.openPopup('#addApp', '修改应用', '/App/Edit?id=' + id + '',  buttons);
+        }
+
+        function EnabledOrDisable(val) {
+            var checkRows = $('#tableApp').datagrid('getChecked');
+            var id = [];
+            $.each(checkRows,
+                function(i, checkRow) {
+                    id[i] = checkRow.a_id;
+                });
+            var ids = id.join(',');
+            if (ids == "") {
+                $.messager.alert('提示', '请选择要操作的数据!', "error");
+
+            } else {
+                $.ajax({
+                    url: G.http.buildUrl("App/EnabledOrDisable"),
+                    type: "post",
+                    data: { IdList: ids, SearchState: val },
+                    success: function(data) {
+                        console.info(data);
+                        if (data.isSuccess) {
+                            dialog.closeMessager('提示', '操作成功!', "tableApp");
+                            return true;
+                        } else {
+                            $.messager.alert('提示', '操作失败!', "error");
+                            return false;
+                        }
+                    }
+                });
+            }
+        }
+        function Enabledone(index) {
+            var row = _grid.getRowByIndex(grid, index);
+            var id = row.a_id;
+            $.ajax({
+                url: G.http.buildUrl("App/EnabledOrDisable"),
+                type: "post",
+                data: { IdList: id, SearchState: 1 },
+                success: function(data) {
+                    if (data.isSuccess) {
+                        dialog.closeMessager('提示', '操作成功!', "tableApp");
+                        return true;
+                    } else {
+                        $.messager.alert('提示', '操作失败!', "error");
+                        return false;
+                    }
+                }
+            });
+        }
+
+        function Disableone(index) {
+            var row = _grid.getRowByIndex(grid, index);
+            var id = row.a_id;
+            $.ajax({
+                url: G.http.buildUrl("App/EnabledOrDisable"),
+                type: "post",
+                data: { IdList: id, SearchState:0 },
+                success: function (data) {
+                    console.info(data);
+                    if (data.isSuccess) {
+                        dialog.closeMessager('提示', '操作成功!', "tableApp");
+                        return true;
+                    } else {
+                        $.messager.alert('提示', '操作失败!', "error");
+                        return false;
+                    }
+                }
+            });
+        }
+
+        //应用审核
+        function Auditing(index) {
+            var row = _grid.getRowByIndex(grid, index);
+            var id = row.a_id;
+            var buttons = [
+                {
+                    text: '保存',
+                    iconCls: 'icon-save',
+                    handler: function () {
+                        SaveUpdateAppAuditing();
+                    }
+                }
+            ];
+            dialog.openPopup('#addApp', '审核', '/App/AppAuditing?id=' + id + '', buttons,"","700px","400px");
+        }
+        //通道设置
+        function AppRate(index) {
+            var row = _grid.getRowByIndex($("#tableApp"), index);
+           
+            var id = row.a_id;
+            var buttons = [
+                {
+                    text: '保存',
+                    iconCls: 'icon-save',
+                    handler: function () {
+                        AppRateSetup();
+                    }
+                }
+            ];
+            dialog.openPopup('#addApp', '通道设置', '/App/AppRate?id=' + id + '', buttons); 
+        }
+
+    </script>
+}
+
+

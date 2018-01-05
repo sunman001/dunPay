@@ -1,0 +1,74 @@
+﻿/* 主框架 */
+* { margin: 0; padding: 0; box-sizing: border-box;}
+h1, h2, h3, h4, h5, h6, button, input, textarea, select { font-size: 100%; }
+fieldset, img { border: 0; }
+table { border-collapse: collapse; border-spacing: 0; width: 100%; }
+caption, th { text-align: left; }
+li { list-style: none; }
+address, cite, code, dfn, var, em, th, i { font-style: normal; font-weight: normal; }
+button, input, textarea { outline: none; font-family: inherit; }
+h1, h2, h3, h4, h5, h6 { font-weight: normal; }
+a { text-decoration: none; }
+    a:active, a:hover { outline: 0; text-decoration: none; }
+select, dl { word-wrap: normal; }
+input, button { border: 0px; }
+article, aside, details, figcaption, figure, footer, header, hgroup, main, menu, nav, section, summary { display: block; }
+audio, canvas, progress, video { display: inline-block; vertical-align: baseline; }
+i { font-style: normal; }
+body { font: 14px/1.5 "Microsoft YaHei"; color: #333; word-wrap: break-word; word-break: break-all; background: #fff; min-width: 1300px; }
+.clearfix:after { content: ""; display: block; height: 0.1px; font-size: 0.1em; line-height: 0; }
+.clearfix { zoom: 100%; }
+.fl { float: left; }
+.fr { float: right; }
+.tmp-blue-grad .header-brand, .tmp-blue-grad .header-nav { background: linear-gradient(to bottom,#3498db 0%,#2980b9 100%); }
+.tmp-blue-grad .head-btn:hover, .tmp-blue-grad .head-btn.active { color: #fff; background: #005486; }
+.tmp-blue-grad .header-pull .fa, .tmp-blue-grad .header-pull .count, .tmp-blue-grad .header-pull .name { color: #fff; }
+/*顶部*/
+.main-header { background-size: 320px 50px; background-position: 5px 4px; height: 50px; -webkit-box-shadow: 0px 1px 3px 0 rgba(0,0,0,0.1); -moz-box-shadow: 0px 1px 3px 0 rgba(0,0,0,0.1); box-shadow: 0px 1px 3px 0 rgba(0,0,0,0.1); color: #ffffff; overflow: hidden }
+.header-brand { color: #fff; font-size: 0; width: 190px; padding: 10px 15px; display: block; float: left; }
+    .header-brand > img { padding-right: 4px; height: 30px; }
+.header-nav { height: 50px; background-color: #3498db; /*background: linear-gradient(to bottom,#3498db 0%,#2980b9 100%)*/ }
+    .header-nav .btn-bars { height: 50px; width: 50px; line-height: 50px; text-align: center; display: block; color: #fff; cursor: pointer; float: left; }
+.header-pull { float: right; padding-right: 10px; }
+    .header-pull > li { float: left; position: relative; line-height: 50px; }
+    .header-pull .cnt { padding: 0px 18px; display: block; position: relative; }
+    .header-pull .count { position: absolute; background: #e74c3c; border-radius: 50%; font-size: 9px; line-height: 14px; width: 15px; height: 15px; text-align: center; top: 8px; right: 7px; }
+    .header-pull .head-img { -webkit-border-radius: 50%; -moz-border-radius: 50%; border-radius: 50%; height: 35px; margin-right: 5px; width: 35px; vertical-align: middle; }
+    .header-pull .name { color: #fff; }
+    .header-pull .caret { color: #fff; display: inline-block; width: 0; height: 0; margin-left: 2px; vertical-align: middle; border-top: 4px solid; border-right: 4px solid transparent; border-left: 4px solid transparent; }
+.dropdown-menu { display: none; position: absolute; top: 49px; left: 0; z-index: 1000; float: left; min-width: 150px; padding: 5px 0px; font-size: 14px; text-align: left; list-style: none; background-color: #fff; -webkit-background-clip: padding-box; background-clip: padding-box; border: 1px solid #ccc; border: 1px solid rgba(0,0,0,.15); border-radius: 4px; -webkit-box-shadow: 0 6px 12px rgba(0,0,0,.175); box-shadow: 0 6px 12px rgba(0,0,0,.175); }
+    .dropdown-menu li { }
+        .dropdown-menu li > a { font-size: 12px; color: #666; display: block; padding: 0px 10px; height: 30px; line-height: 30px; }
+        .dropdown-menu li:hover a { background: #f6f6f6 }
+.dropdown-thme { overflow: hidden; min-width: auto; }
+    .dropdown-thme li { padding-left: 5px; padding-bottom: 5px; line-height: 0px; float: left; }
+    .dropdown-thme .theme { width: 30px; height: 30px; display: inline-block; cursor: pointer; }
+    .dropdown-thme .blue-grad { background: linear-gradient(to bottom,#3498db 0%,#2980b9 100%); }
+    .dropdown-thme .blue-red { background: #e74c3c; }
+    .dropdown-thme .blue-green { background: #2ecc71; }
+.header-nav .txt { color: #ffffff }
+.idx-fl { padding: 0; z-index: 100; position: absolute; background: #2c3e50; width: 220px; left: 0px; }
+.nav > li > a { display: block; position: relative; color: #fff; height: 44px; line-height: 44px; overflow: hidden; padding: 0px 15px 0px 20px; border-left: 4px solid transparent; }
+.nav .fa { font-size: 1.115em; vertical-align: initial; }
+.nav .name { padding-left: 12px; font-size: 12px }
+.nav .fa-chevron-circle-right { color: #868b98; font-size: 12px; position: absolute; right: 25px; top: 17px; -webkit-transition: -webkit-transform 0.2s ease-in-out 0.1s; transition: transform 0.2s ease-in-out 0.1s; }
+.nav > li > a:hover, .nav > li.active > a { background-color: #1a1d22; color: #fff; border-left-color: #3498db; }
+.nav li.active .fa-chevron-circle-right { color: #fff; -webkit-transform: rotate(90deg); transform: rotate(90deg); }
+.submenu { display: none; background: #1a1d22; padding: 5px 0; list-style: none; }
+    .submenu > li { }
+        .submenu > li > a { position: relative; display: block; height: 38px; line-height: 38px; color: #fff; font-size: 12px; padding-left: 65px; }
+            .submenu > li > a:hover, .submenu > li.active > a { background: #121418; }
+.nav .label { position: absolute; right: 19px; top: 12px; color: #fff; font-size: 12px; line-height: 1px; padding: 9px 4px; }
+.nav .cirle { border-radius: 50%; }
+.nav .wane { border-radius: 3px; }
+.nav .blue { background: #3498db; }
+.nav .green { background: #2ecc71; }
+.nav .org { background: #e74c3c }
+.main-buttom { height: 30px; padding-top: 10px; text-align: center; background: #f6f6f6 }
+.main-menu { width: 200px; overflow: auto; padding: 0; }
+    .main-menu .menu-item { overflow: auto }
+.middle { vertical-align: middle; }
+
+
+#mytree { display: none; }
+#main_tab_wrap { position: relative; background-color: #E7EBEE; }

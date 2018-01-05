@@ -1,0 +1,23 @@
+﻿@using System.Web.Optimization
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="width=device-width"/>
+    <title>@ViewBag.Title</title>
+    <link href="~/assets/easyui/themes/gray/easyui.css" rel="stylesheet"/>
+    <link href="~/assets/easyui/themes/icon.css" rel="stylesheet"/>
+    @Styles.Render("~/css/mains")
+    @RenderSection("styles", false)
+    
+</head>
+<body>
+    @RenderBody()
+    @Scripts.Render("~/js/main")
+    @Scripts.Render("~/js/easyui")
+    @RenderSection("scripts", false)
+</body>
+</html>

@@ -1,0 +1,84 @@
+﻿
+@{
+    ViewBag.Title = "AppAuditing";
+    Layout = "~/Views/Shared/_layout_form.cshtml";
+}
+<form id="dx-form" class="dx-form" method="post">
+    <input type="hidden" id="id" name="id" value="" />
+    <div class="form-groups">
+        <label>
+            <span class="form-group-labels">风险等级: </span>
+            <input id="rid" value="" name="rid" style="width:400px;" />
+        </label>
+    </div>
+    <div class="form-groups">
+        <label>
+            <span class="form-group-labels">审核状态: </span>
+            <span id="auditstatespan"></span>
+        </label>
+    </div>
+</form>
+@section scripts{
+    <script type="text/javascript">
+        $(function () {
+            $("#id").val('@Request.QueryString["id"]');
+            $.ajax({
+                url: G.http.buildUrl("App/Edit/" + $("#id").val()),
+                dataType: 'json',
+                type: 'get',
+                success: function(data) {
+                    $('#rid').combobox({
+                        url: G.http.buildPublicUrl("combobox/Getrisklevelallocation/" + data.a_apptype_id),
+                        method: 'get',
+                        valueField: 'id',
+                        textField: 'text',
+                        editable: false,
+                        required: true,
+                        onLoadSuccess: function() {
+                            $("#rid").combobox("setValue", data.a_rid);
+                            var html = "";
+                            var a = data.a_auditstate == 0 ? "checked='checked'" : "";
+                            var b = data.a_auditstate == 1 ? "checked='checked'" : "";
+                            var c = data.a_auditstate == 2 ? "checked='checked'" : "";
+                            html += "<input name='a_auditstate'  value='0'  " + a + "  type='radio' >未审核 </input>";
+                            html += "<input name='a_auditstate'  value='1'  " + b + "  type='radio' >审核通过 </input>";
+                            html += "<input name='a_auditstate'  value='2'  " + c + "  type='radio' >审核未通过 </input>";
+                            $("#auditstatespan").html(html);
+                        }
+
+                    });
+                }
+            });
+
+           
+        });
+        //审核方法
+        function SaveUpdateAppAuditing() {
+
+            var rid = $.trim($("#rid").combobox("getValue"));
+            if (rid == 0) {
+                $.messager.alert('警告', '必填项没有填写完整！');
+                return false;
+            }
+            var auditstate = $.trim($('input[name="a_auditstate"]:checked').val());
+            var aid = $("#id").val();
+            var data = { id: $.trim(aid), rid: $.trim(rid), state: $.trim(auditstate) };
+            $.ajax({
+                url: G.http.buildUrl("App/AppAuditing"),
+                dataType: 'json',
+                type: 'post',
+                data: data,
+                success: function (response) {
+                    if (response.isSuccess) {
+                        dialog.closePopup("提示", response.message, "addApp", "tableAPP");
+                    }
+                    else {
+                        $.messager.alert('提示', response.message);
+                    }
+                }
+            });
+
+        }
+
+    </script>
+}

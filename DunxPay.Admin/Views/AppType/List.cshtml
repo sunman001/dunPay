@@ -1,0 +1,167 @@
+﻿
+@{
+    ViewBag.Title = "List";
+    Layout = "~/Views/Shared/_layout_list.cshtml";
+}
+
+@section toolbar_search
+{
+    <div id="select-txt">
+        <ul class="frm-ul clearfix">
+            <li>
+                <select id="type" class="easyui-combobox" editable="false" style="width: 100px; height: 30px;">
+                    <option value="1">应用类型编号</option>
+                    <option value="2">应用类型名称</option>
+                </select>
+            </li>
+            <li>
+                <input id="txtseach" class="easyui-textbox" style="width: 150px; height: 30px;" data-options="prompt:'请输入关键字...'," />
+            </li>
+            <li>
+                <select id="state" class="easyui-combobox" editable="false" style="width: 100px; height: 30px;">
+                    <option value="-1">状态</option>
+                    <option value="0">锁定</option>
+                    <option value="1">正常</option>
+                </select>
+            </li>
+            <li>
+                <input id="pid" style="width: 100px; height: 30px;">
+            </li>
+            <li>
+                <a href="javascript:search();" id="btnSearch" class="btn btn-primary">查询</a>
+            </li>
+        </ul>
+    </div>
+
+}
+<table id="tableAppType" toolbar="#toolbar"></table>
+<div id="addAppType"> </div>
+@section scripts{
+    <script src="~/assets/easyui/datagrid-detailview.js"></script>
+    <script type="text/javascript">
+        //加载平台集合
+        $('#pid').combobox({
+            url: G.http.buildPublicUrl("combobox/GetAppType"),
+            method: 'post',
+            valueField: 'id',
+            textField: 'text',
+            editable:false
+            
+        });
+        var grid = $("#tableAppType");
+        var _options = {
+            url: "appType/list", //后台加载地址
+            idField: "id", //主键列
+            sortName: "sort", //默认排序字段
+            columns: [//列头
+                [
+                    { field: '', checkbox: true },
+                    { field: 'id', title: '应用类型编号', width:100, align: 'left', sortable: true },
+                    { field: 'sort', title: '排序', width: 80, align: 'left', sortable: true  },
+                    {field: 'name',title: '应用类型名称', width: 200,sortable: true,align: 'left',resizable: true,fixed: true },
+                    { field: 'parentName',title: '所属应用类型', width: 200,resizable: true, fixed: true, sortable: true, align: 'left' },
+                    {
+                        field: 'state', title: '状态', width: 200, align: 'left',
+                        formatter: function (value) {
+                            if (value == 1) {
+                                return "<font style='color:green' >正常 </font>";
+                            } else {
+                                return "<font style='color:red' >锁定 </font>";
+                            }
+                            
+                        }
+                    },
+                    {
+                        field: "_operate",
+                        title: "操作",
+                        width: 200,
+                        align: "center",
+                        sortable: false,
+                        formatter: function(value, row, index) {
+                            return buildAction(row, index);
+                        }
+                    }
+                ]
+            ],
+            onLoadSuccess() {
+                $('.button-action').linkbutton({ plain: 'true' });
+            }
+
+        };
+        dxgrid.datagrid(grid, _options);
+        //查询
+        window.search = function () {
+            grid.datagrid("load",
+                {
+                    type: $.trim($("#type").combobox("getValue")),
+                    keyword: $.trim($("#txtseach").textbox("getValue")),
+                    state: $.trim($("#state").combobox("getValue")),
+                    pid: $.trim($("#pid").combobox("getValue"))
+                });
+        };
+
+        //添加
+        function create() {
+            var buttons = [
+                {
+                    text: '保存',
+                    iconCls: 'icon-save',
+                    handler: function () {
+                        save();
+                    }
+                }
+
+            ];
+            dialog.openPopup('#addAppType', '新增应用类型', '/AppType/CreateorEdit', buttons);
+        }
+        //修改
+        function Edit(index) {
+            var row = _grid.getRowByIndex(grid, index);
+          
+            var id = row.id;
+            var buttons = [
+                {
+                    text: '修改',
+                    iconCls: 'icon-save',
+                    handler: function () {
+                        Edits();
+                    }
+                }
+            ];
+            dialog.openPopup('#addAppType', '修改应用类型', '/AppType/CreateorEdit?id=' + id + '', buttons,"", "600px", "300px");
+        }
+
+        function EnabledOrDisable(val) {
+            var checkRows = $('#tableAppType').datagrid('getChecked');
+            var id =[];
+            $.each(checkRows,
+                function (i, checkRow) {
+                    id[i] = checkRow.id;
+                });
+            var ids = id.join(',');
+            if (ids == "") {
+                $.messager.alert('提示', '请选择要操作的数据!', "error");
+
+            } else {
+                $.ajax({
+                    url: G.http.buildUrl("AppType/EnabledOrDisable"),
+                    type: "post",
+                    data: { IdList: ids, SearchState: val },
+                    success: function (data) {
+                        console.info(data);
+                        if (data.isSuccess ) {
+                            dialog.closeMessager('提示', '操作成功!',"tableAppType");
+                            return true;
+                        } else {
+                            $.messager.alert('提示', '操作失败!', "error");
+                            return false;
+                        }
+                    }
+                });
+            }
+        }
+
+    </script>
+    }
+       
+

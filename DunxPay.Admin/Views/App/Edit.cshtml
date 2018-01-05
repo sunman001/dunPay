@@ -1,0 +1,198 @@
+﻿
+@{
+    ViewBag.Title = "Edit";
+    Layout = "~/Views/Shared/_layout_form.cshtml";
+}
+
+<form id="dx-form" class="dx-form" method="post">
+    <input type="hidden" id="id" name="id" value="" />
+    <div id="toolbar1" class="toolbar">
+        <div id="select-txt">
+            <ul class="frm-ul clearfix">
+                <li>
+                    <select id="searchTypes" class="easyui-combobox" editable="false" style="width: 100px; height: 30px;">
+                        <option value="1">真实姓名</option>
+                        <option value="2">邮箱</option>
+                        <option value="3">身份证号</option>
+                        <option value="4">营业执照</option>
+                    </select>
+                </li>
+                <li>
+                    <input id="sea_names" class="easyui-textbox" style="width: 150px; height: 30px;" data-options="prompt:'请输入关键字...'," />
+                </li>
+                <li>
+                    <a href="javascript:searchs();" id="btnSearch" class="btn btn-primary">查询</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <div id="listuser"></div>
+    <div class="form-group">
+        <label>
+            <span class="form-group-label">应用名称:</span>
+            <input id="name" class="easyui-textbox easyui-validatebox" name="name" type="text" data-options="required:true,validType:['Length[1,20]']" style="width:400px;" />
+        </label>
+    </div>
+    <div class="form-group">
+        <label>
+            <span class="form-group-label">关联平台:</span>
+            <select id="platformids" class="easyui-combobox" style="width:400px;">
+                <option value="1">安卓</option>
+                <option value="2">苹果</option>
+                <option value="3">H5</option>
+            </select>
+        </label>
+    </div>
+    <div class="form-groups">
+        <label>
+            <span class="form-group-labels">支付类型: </span>
+            <span id="paymode"></span>
+        </label>
+    </div>
+    <div class="form-group">
+        <label>
+            <span class="form-group-label">关联应用: </span>
+            <input id="paytypeParentId" value="" name="paytypeParentId" style="width:200px;" />
+            <input id="paytypeId" name="paytypeId" style="width:200px; " />
+        </label>
+    </div>
+    <div class="form-group">
+        <label>
+            <span class="form-group-label">回调地址：</span>
+            <input id="notifyurl" class="easyui-textbox easyui-validatebox" name="notifyurl" type="text" data-options="required:true ,validType:['Address']" style="width:400px;" /><span style="color: red">(必须以http://或者https://开头)</span>
+        </label>
+    </div>
+    <div class="form-group" id="tbhddz" style="display:none;">
+        <label>
+            <span class="form-group-label"> 同步回调地址：</span>
+            <input id="showurl" class="easyui-textbox easyui-validatebox" name="notifyurl," type="text" style="width:400px;" /><span style="color: red">(必须以http://或者https://开头)</span>
+        </label>
+    </div>
+    <div class="form-group">
+        <label class="form-group-label">
+            <span class="form-group-label"> 开发者：</span>
+            <input id="userid" name="userid" value="" toolbar="#toolbar1" data-options="required:true" style="width:400px;">
+        </label>
+    </div>
+    <div class="form-group">
+        <label>
+            <span class="form-group-label">应用地址:</span>
+            <input id="appurl" class="easyui-textbox easyui-validatebox " name="appurl" type="text" data-options="required:true,validType:['Address']" style="width:400px;" /><span style="color: red">(必须以http://或者https://开头)</span>
+        </label>
+    </div>
+    <div class="form-group form-inline">
+        <label class="form-group-label">
+            <span class="form-group-label">应用简介:</span>
+            <input id="appsynopsis" class="easyui-textbox easyui-validatebox " name="appurl" type="text" data-options="required:true,multiline:true,validType:['Length[20,100]']" style="width:400px; height: 100px;" />
+        </label>
+    </div>
+</form>
+@section scripts{
+    <script src="~/app/js/combogrid/UserCombogrid.js"></script>
+    <script type="text/javascript">
+        var paymodel;
+        //加载父级应用类型
+        $('#paytypeParentId').combobox({
+            url: G.http.buildPublicUrl("combobox/GetAppTypePay"),
+            method: 'post',
+            valueField: 'id',
+            textField: 'text',
+            editable: false,
+            required: true,
+            onChange: function(Value) {
+                if (Value > 0) {
+                    $('#paytypeId').combobox({
+                        url: G.http.buildPublicUrl("combobox/GetAppTypeByParentId/" + Value + ""),
+                        method: 'get',
+                        valueField: 'id',
+                        textField: 'text',
+                        editable: false,
+                        required: true,
+                        onLoadSuccess: function() {
+                            var data = $("#paytypeId").combobox("getData");
+                            // console.info("data:", data);
+                            var ids = data.map(x => x.id);
+                            // console.info("ids:", ids);
+                            if (ids.indexOf(paymodel.a_apptype_id)>-1) {
+                                $("#paytypeId").combobox("setValue", paymodel.a_apptype_id);
+                            }
+                        }
+                    });
+                }
+            }
+        });
+        $("#id").val('@Request.QueryString["id"]');
+        $.ajax({
+            url: G.http.buildUrl("App/Edit/" + $("#id").val()),
+            dataType: 'json',
+            type: 'get',
+            success: function(data) {
+                paymodel = data;
+                $("#name").textbox("setValue", data.a_name);
+              
+                $.ajax({
+                    url: G.http.buildUrl("AppType/Edit/" + data.a_apptype_id),
+                    dataType: 'json',
+                    type: 'get',
+                    success: function(apptype) {
+                        $("#paytypeParentId").combobox("setValue", apptype.parentId);
+                        //console.info(data.a_apptype_id);
+
+                    }
+                });
+                $("#notifyurl").textbox("setValue", data.a_notifyurl);
+                $("#showurl").textbox("setValue", data.a_showurl);
+                $("#userid").combogrid("setValue", data.a_user_id);
+                $("#appurl").textbox("setValue", data.a_appurl);
+                $("#appsynopsis").textbox("setValue", data.a_appsynopsis);
+                //console.info(data.a_paymode_id);
+                var a_paymode = data.a_paymode_id.split(',');
+                // 加载支付类型输出HTML
+                $.ajax({
+                    url: G.http.buildUrl("App/GetPayModeList"),
+                    dataType: 'json',
+                    type: 'get',
+                    success: function(payttype) {
+                        var html = "";
+                        if (payttype.length > 0) {
+                            for (var k = 0; k < payttype.length; k++) {
+                                var check = true;
+                                for (var i = 0; i < a_paymode.length; i++) {
+                                    if (payttype[k].p_id == a_paymode[i]) {
+
+
+                                        html += "<input name='zflx'  id='paytype_" +
+                                            payttype[k].p_id +
+                                            "' data-stat='" +
+                                            payttype[k].p_islocked +
+                                            "' value='" +
+                                            payttype[k].p_id +
+                                            "'  checked=\"checked\"   type='checkbox'>" +
+                                            payttype[k].p_name +
+                                            " </input>";
+                                        check = false;
+                                        break;
+                                    }
+                                }
+                                if (check) {
+                                    html += "<input name='zflx'  id='paytype_" +
+                                        payttype[k].p_id +
+                                        "' data-stat='" +
+                                        payttype[k].p_islocked +
+                                        "' value='" +
+                                        payttype[k].p_id +
+                                        "'  type='checkbox' >" +
+                                        payttype[k].p_name +
+                                        "</input>";
+                                }
+                            }
+                        }
+                        $("#paymode").html(html);
+                        $("#platformids").combobox("setValue", data.a_platform_id);
+                    }
+                });
+            }
+        });
+    </script>
+<script src="~/app/js/app.js"></script>
+}

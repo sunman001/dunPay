@@ -1,0 +1,122 @@
+﻿
+@{
+    ViewBag.Title = "CREATE";
+    Layout = "~/Views/Shared/_layout_form.cshtml";
+}
+<form id="dx-form" class="dx-form" method="post">
+    <div class="form-group">
+        <label>
+            <span class="form-group-label">平台名称:</span>
+            <input id="clientId" value="1" />
+        </label>
+    </div>
+    <div class="form-group">
+        <label>
+            <span class="form-group-label">父模块名称:</span>
+            <input id="parentIdentifyCode">
+        </label>
+    </div>
+    <div class="form-group">
+        <label>
+            <span class="form-group-label">模块名称:</span>
+            <input id="name" class="easyui-textbox easyui-validatebox" type="text" data-options="required:true" />
+        </label>
+    </div>
+    <div class="form-group">
+        <label>
+            <span class="form-group-label">请求路径:</span>
+            <input id="requestUrl" class="easyui-textbox" type="text" data-options="required:true"   />
+        </label>
+    </div>
+    <div class="form-group">
+        <label>
+            <span class="form-group-label">图标:</span>
+            <input id="icon" class="easyui-textbox" type="text"  data-options="required:true"/>
+        </label>
+    </div>
+    <div class="form-group">
+        <label>
+            <span class="form-group-label">排序:</span>
+            <input id="sort" class="easyui-textbox easyui-numberbox " value="0" type="text" name="name" data-options="required:true"  />
+        </label>
+    </div>
+    <div class="form-group">
+        <label>
+            <span class="form-group-label">描述:</span>
+            <input id="description" class="easyui-textbox" type="text"  data-options="multiline:true" style="height:100px"/>
+        </label>
+    </div>
+   
+</form>
+@section scripts{
+    <script type="text/javascript">
+        //加载平台集合
+        $('#clientId').combobox({
+            url: G.http.buildPublicUrl("combobox/getclient"),
+            method: 'post',
+            valueField: 'id',
+            textField: 'text',
+            editable:false,
+            required: true
+        });
+
+        //加载模块集合
+        var clientId = $.trim($("#clientId").combobox("getValue"));
+        $('#parentIdentifyCode').combotree({
+            url: G.http.buildPublicUrl("combobox/GetModule?dxClientId=" + clientId + "")
+           
+        });
+        //当选择平台时 重新加载模块信息
+        $('#clientId').combobox({
+            onChange: function(Value) {
+                $('#parentIdentifyCode').combotree({
+                    url: G.http.buildPublicUrl("combobox/GetModule?dxClientId=" + Value + ""),
+                    required: true
+                });
+            }
+        });
+
+        //保存
+        function save() {
+            var clientId = $.trim($("#clientId").combobox("getValue"));
+            var clientName = $.trim($("#clientId").combobox("getText"));
+            var parentId = $.trim($("#parentIdentifyCode").combotree("getValue"));
+            var name = $.trim($("#name").textbox("getValue"));
+            var requestUrl = $.trim($("#requestUrl").textbox("getValue"));
+            var icon = $.trim($("#icon").textbox("getValue"));
+            var sort = $.trim($("#sort").textbox("getValue"));
+            var description = $.trim($("#description").textbox("getValue"));
+            var data = {
+                name: name,
+                clientName: clientName,
+                clientId: clientId,
+                parentIdentifyCode: parentId,
+                requestUrl: requestUrl,
+                icon: icon,
+                sort: sort,
+                description: description};
+            var form = $("#dx-form");
+            if (!form.form("validate")) {
+                $.messager.alert('警告', '必填项没有填写完整！');
+            } else {
+                $.ajax({
+                    url: G.http.buildUrl("Module/Create"),
+                    dataType: 'json',
+                    type: 'post',
+                    data: data,
+                    success: function (response) {
+                        if (response.isSuccess) {
+                            dialog.closePopup("提示", response.message, "addModule","tableModule",1);
+                        }
+                        else
+                        {
+                            $.messager.alert('提示', response.message );     
+                        }
+                    }
+                });
+            }
+
+
+        }
+    </script>
+}
